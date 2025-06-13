@@ -9,6 +9,52 @@
 
 ## Configuración inicial para Git
 
+# Eliminar la configuración previa de Git
+```bash
+# Eliminar la configuración previa de Git
+git config --global --unset user.name
+git config --global --unset user.email
+git config --global --unset credential.helper
+git config --global --unset init.defaultBranch
+git config --global --unset core.editor
+```
+# Eliminación completa de las credenciales de Git
+```bash
+# Eliminar las credenciales almacenadas
+git credential-manager uninstall
+
+# Eliminar el perfil de Git
+git config --global --remove-section user
+git config --global --remove-section credential
+git config --global --remove-section init
+git config --global --remove-section core
+
+# Eliminar el directorio de configuración de Git
+rm -rf ~/.gitconfig
+
+# Eliminar el directorio de credenciales de Git
+rm -rf ~/.git-credentials
+
+# Eliminar el directorio de configuración de Git en Windows
+rm -rf C:\Users\TuUsuario\.gitconfig
+
+# Eliminar el directorio de credenciales de Git en Windows
+rm -rf C:\Users\TuUsuario\.git-credentials
+
+# Listar las configuraciones de Git para verificar que se han eliminado
+git config --global --list
+```
+
+# Eliminación completa de las credenciales y perfil de Git en Windows
+```bash
+# Listar credenciales almacenadas en Windows
+cmdkey /list
+
+# Eliminar credenciales específicas de GitHub
+cmdkey /delete:git:https://github.com
+cmdkey /delete:LegacyGeneric:target=git:https://github.com
+```
+
 # Configuración de Git
 ```bash
 # Comprobar la versión de Git
