@@ -1,6 +1,6 @@
-# Description: This script deletes stored GitHub credentials from the Windows Credential Manager.
-# Usage: Run this script in PowerShell to remove GitHub credentials.
-# Requirements: PowerShell with the CredentialManager module installed.
+# Descripción: Este script elimina las credenciales de GitHub almacenadas en el Administrador de Credenciales de Windows.
+# Uso: Ejecute este script en PowerShell para eliminar las credenciales de GitHub.
+# Requisitos: PowerShell con el módulo CredentialManager instalado.
 
 # Instalar y cargar el módulo CredentialManager
 try {
@@ -37,6 +37,7 @@ try {
 # Pausar la ejecución para revisión
 cmd /c pause
 
-# Note: Ensure you have the necessary permissions to delete credentials from the Credential Manager.
-# This script is intended to be run in a PowerShell environment with administrative privileges.
-# End of script
+# Nota: Asegúrese de tener los permisos necesarios para eliminar credenciales del Administrador de Credenciales.
+# Este script está diseñado para ejecutarse en un entorno PowerShell con privilegios administrativos.
+# Fin del script
+
