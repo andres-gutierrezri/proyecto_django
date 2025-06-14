@@ -45,10 +45,22 @@ rm -rf C:\Users\TuUsuario\.git-credentials
 git config --global --list
 ```
 
+# Eliminar credenciales específicas de GitHub (alternativa)
+```bash
+# Eliminar credenciales específicas de GitHub
+git credential reject
+protocol=https
+host=github.com
+username=tu_usuario
+```
+
 # Eliminación completa de las credenciales y perfil de Git en Windows
 ```bash
 # Listar credenciales almacenadas en Windows
 cmdkey /list
+
+# Filtrar credenciales de GitHub
+cmdkey /list | findstr github
 
 # Eliminar credenciales específicas de GitHub
 cmdkey /delete:git:https://github.com
