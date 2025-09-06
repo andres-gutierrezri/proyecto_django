@@ -1,6 +1,8 @@
 @echo off
+setlocal EnableDelayedExpansion
+chcp 65001 >nul
 echo ================================================================
-echo INICIADOR DE APLICACION DJANGO CON ENTORNO VIRTUAL
+echo INICIADOR DE APLICACIÓN DJANGO CON ENTORNO VIRTUAL
 echo ================================================================
 
 cd /d "%~dp0"
@@ -19,12 +21,18 @@ if not exist ".venv\" (
     echo ✅ Entorno virtual ya existe
 )
 
-echo 🐍 Activando entorno virtual...
-call .venv\Scripts\activate.bat
-if %errorlevel% neq 0 (
-    echo ❌ Error al activar entorno virtual
-    pause
-    exit /b 1
+echo 🔎 Verificando estado del entorno virtual...
+if defined VIRTUAL_ENV (
+    echo ✅ Entorno virtual ya está activado: %VIRTUAL_ENV%
+) else (
+    echo ⚠️  Entorno virtual no está activado, se procederá a activarlo:
+    echo 🐍 Activando entorno virtual...
+    call .venv\Scripts\activate.bat
+    if %errorlevel% neq 0 (
+        echo ❌ Error al activar entorno virtual
+        pause
+        exit /b 1
+        )
 )
 
 echo ⬆️  Actualizando pip...
@@ -57,7 +65,7 @@ if %errorlevel% neq 0 (
 echo ✅ Migraciones completadas
 
 echo 🚀 Iniciando servidor de desarrollo...
-echo 📍 URL de la aplicacion: http://127.0.0.1:8000/app_1/
+echo 📍 URL de la aplicación: http://127.0.0.1:8000/app_1/
 echo ⏹️  Presiona Ctrl+C para detener el servidor
 
 timeout /t 3 /nobreak > nul
