@@ -106,16 +106,22 @@ Get-ExecutionPolicy -List
 
 # Verificar la instalación de Python y pip
 ```bash
-# comprobar la versión de Python
+# Comprobar la versión de Python
+# Windows
 python --version
+# macOS/Linux
+python3 --version
 
 # Verificar la instalación de pip
+# Windows
 pip --version
+# macOS/Linux
+pip3 --version
 
 # Actualizar pip
 # Windows
 python.exe -m pip install --upgrade pip --no-cache-dir
-# Linux
+# macOS/Linux
 python3 -m pip install --upgrade pip --no-cache-dir
 
 # Actualizar pip a la última versión
@@ -125,17 +131,23 @@ pip install --upgrade pip
 # Instalar entorno virtual de Python
 ```bash
 # Instalar entorno virtual de Python
+# Windows
 python -m venv .venv
+# macOS/Linux
+python3 -m venv .venv
 
 # Activar el entorno virtual
 # Windows
 .\.venv\Scripts\activate
-# Linux
+# macOS/Linux
 source .venv/bin/activate
 
 # Comprobar que el entorno virtual está activado
 # Debe mostrar la ruta del entorno virtual
+# Windows
 python -c "import sys; print(sys.prefix)"
+# macOS/Linux
+python3 -c "import sys; print(sys.prefix)"
 
 # Actualizar pip dentro del entorno virtual
 python -m pip install --upgrade pip --no-cache-dir
@@ -163,6 +175,31 @@ django-admin --version
 ```
 
 ## Uso inicial (Ejecutar el proyecto)
+
+### Método automático (recomendado)
+Utilice los scripts de inicio automático que configuran el entorno completo:
+
+```bash
+# Windows
+start_server.bat
+
+# macOS/Linux
+./start_server.sh
+
+# Multiplataforma (Python)
+python start_server.py      # Windows
+python3 start_server.py     # macOS/Linux
+```
+
+Estos scripts automáticamente:
+- Crean y activan el entorno virtual
+- Verifican y reparan pip si es necesario
+- Instalan las dependencias desde requirements.txt
+- Ejecutan las migraciones de la base de datos
+- Inician el servidor de desarrollo
+- Abren el navegador en http://127.0.0.1:8000/
+
+### Método manual
 Para comenzar a trabajar con el proyecto, asegúrese de que el entorno virtual está activado y que ha instalado todas las dependencias necesarias. A continuación, puede ejecutar el proyecto Django, debe correr las siguientes instrucciones:
 
 ```bash
