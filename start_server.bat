@@ -43,6 +43,7 @@ if defined VIRTUAL_ENV (
         pause
         exit /b 1
         )
+    echo ✅ Entorno virtual activado exitosamente
 )
 
 echo 🔧 Verificando integridad de pip...
