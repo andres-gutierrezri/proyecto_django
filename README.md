@@ -398,10 +398,63 @@ El proyecto está preparado para despliegue en plataformas cloud (Heroku, Render
 
 - **Procfile**: Define el comando de inicio con Gunicorn
   ```
-  web: python3 manage.py collectstatic && python3 manage.py makemigrations && python3 manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --log-file -
+  web: python3 manage.py collectstatic && python3 manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --log-file -
   ```
+- **nixpacks.toml**: Configuración para Railway/Nixpacks (Python 3.13, PostgreSQL, MySQL)
 - **runtime.txt**: Especifica Python 3.13.0
 - **WhiteNoise**: Configurado para servir archivos estáticos sin nginx
+
+### Despliegue en Railway (Recomendado)
+
+Railway utiliza Nixpacks para construir y desplegar la aplicación automáticamente.
+
+**Configuración `nixpacks.toml`:**
+- Instala Python 3.13, PostgreSQL 16, MySQL 8.0
+- Crea entorno virtual aislado (venv)
+- Configura compilación de mysqlclient con MariaDB Connector/C
+- Ejecuta collectstatic, migrate y gunicorn automáticamente
+
+**Proceso de despliegue:**
+
+1. **Conectar repositorio a Railway:**
+   - Crear nuevo proyecto en Railway
+   - Conectar repositorio Git (GitHub/GitLab)
+   - Railway detectará automáticamente `nixpacks.toml`
+
+2. **Configurar variables de entorno en Railway:**
+   ```bash
+   IS_DEPLOYED=True
+   SECRET_KEY=clave-secreta-segura-generada
+   DATABASE_SELECTOR=postgresql  # o mysql
+   POSTGRESQL_DATABASE_URL=${RAILWAY_POSTGRESQL_URL}  # Auto-generada por Railway
+   # O para MySQL:
+   # MYSQL_DATABASE_URL=${RAILWAY_MYSQL_URL}
+
+   # Opcional: AWS S3 para archivos media
+   AWS_ACCESS_KEY_ID=tu-access-key
+   AWS_SECRET_ACCESS_KEY=tu-secret-key
+   AWS_STORAGE_BUCKET_NAME=tu-bucket
+   AWS_S3_REGION_NAME=us-east-1
+   ```
+
+3. **Railway ejecutará automáticamente:**
+   - Build de la imagen con Nixpacks
+   - Instalación de dependencias en entorno virtual
+   - Recolección de archivos estáticos
+   - Migraciones de base de datos
+   - Inicio del servidor Gunicorn
+
+4. **Acceder a la aplicación:**
+   - Railway proporcionará una URL pública automáticamente
+   - Ejemplo: `https://tu-proyecto.up.railway.app`
+
+**Características de Railway:**
+- ✅ PostgreSQL/MySQL incluido y auto-configurado
+- ✅ Builds automáticos en cada push
+- ✅ Logs en tiempo real
+- ✅ Variables de entorno encriptadas
+- ✅ Escalado horizontal automático
+- ✅ SSL/HTTPS incluido
 
 ### Variables de Entorno para Producción
 
@@ -424,18 +477,38 @@ AWS_S3_REGION_NAME=us-east-1
 
 ### Plataformas Compatibles
 
+- **Railway** ⭐ (Recomendado): PostgreSQL/MySQL, Nixpacks, builds automáticos
 - **Heroku**: PostgreSQL incluido, fácil despliegue con Git
 - **Render**: PostgreSQL gratuito, builds automáticos
-- **Railway**: PostgreSQL, MySQL disponible
 - **DigitalOcean App Platform**: Flexible y escalable
 - **AWS Elastic Beanstalk**: Infraestructura AWS completa
 
-### Proceso de Despliegue
+### Proceso de Despliegue (Plataformas Genéricas)
 
 1. Conectar repositorio Git a la plataforma
 2. Configurar variables de entorno
-3. La plataforma ejecutará automáticamente los comandos del Procfile
+3. La plataforma ejecutará automáticamente los comandos del Procfile o nixpacks.toml
 4. Acceder a la URL proporcionada por la plataforma
+
+### Troubleshooting en Railway
+
+Si el despliegue falla, revisa los logs en Railway:
+
+**Error: "mysqlclient no compila"**
+- Verifica que `nixpacks.toml` tenga `mariadb-connector-c` en nixPkgs
+- Verifica que PKG_CONFIG_PATH esté configurado correctamente
+
+**Error: "No module named pip"**
+- El archivo `nixpacks.toml` usa venv, esto no debería ocurrir
+- Verifica que la fase de install esté configurada correctamente
+
+**Error: "externally-managed-environment"**
+- El archivo `nixpacks.toml` usa venv para evitar este error
+- No modifiques la instalación de paquetes fuera del venv
+
+**Error: Build timeout**
+- Verifica que requirements.txt no tenga dependencias innecesarias
+- Railway tiene un timeout de 10 minutos por defecto
 
 ## 📚 Bases de Datos
 
