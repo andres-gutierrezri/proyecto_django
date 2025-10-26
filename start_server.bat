@@ -206,6 +206,12 @@ if %errorlevel% neq 0 (
 )
 echo.
 
+echo 📁 Recolectando archivos estáticos...
+.venv\Scripts\python.exe manage.py collectstatic --noinput
+if %errorlevel% neq 0 (
+    echo ⚠️  Advertencia al recolectar archivos estáticos ^(puede ser normal si no está configurado^)
+)
+
 echo 🔄 Ejecutando construcción de migraciones...
 .venv\Scripts\python.exe manage.py makemigrations
 if %errorlevel% neq 0 (

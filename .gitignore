@@ -219,3 +219,6 @@ CLAUDE.md
 # Ignore files for warp.dev
 .warp/
 WARP.md
+
+# Ignore files for cursor.ai
+.cursor/

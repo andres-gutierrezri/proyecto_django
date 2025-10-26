@@ -451,7 +451,25 @@ def verify_mysqldb_import(python_executable):
 
 def run_migrations(python_executable):
     """Ejecuta las migraciones de Django"""
-    # Primero ejecutar makemigrations
+    # Primero recolectar archivos estáticos
+    print("📁 Recolectando archivos estáticos...")
+    try:
+        result = subprocess.run([
+            str(python_executable), 
+            "manage.py", 
+            "collectstatic",
+            "--noinput"
+        ], cwd=Path(__file__).parent, check=True, capture_output=True, text=True)
+        print("✅ Archivos estáticos recolectados exitosamente")
+        if result.stdout:
+            print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Advertencia al recolectar archivos estáticos (puede ser normal si no está configurado)")
+        if e.stderr:
+            print(f"Advertencia: {e.stderr}")
+        # No hacer sys.exit(1) aquí porque collectstatic puede fallar si no está configurado
+    
+    # Después ejecutar makemigrations
     print("🔄 Ejecutando makemigrations...")
     try:
         result = subprocess.run([

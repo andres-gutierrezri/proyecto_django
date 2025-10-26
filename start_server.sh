@@ -224,6 +224,12 @@ else
 fi
 echo ""
 
+echo "📁 Recolectando archivos estáticos..."
+.venv/bin/python manage.py collectstatic --noinput
+if [ $? -ne 0 ]; then
+    echo "⚠️  Advertencia al recolectar archivos estáticos (puede ser normal si no está configurado)"
+fi
+
 echo "🔄 Ejecutando construcción de migraciones..."
 .venv/bin/python manage.py makemigrations
 if [ $? -ne 0 ]; then
