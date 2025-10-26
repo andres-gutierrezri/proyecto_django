@@ -1,11 +1,12 @@
 [phases.setup]
-nixPkgs = ["python313", "python313Packages.pip", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
+nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
 
 [phases.install]
-# Calcula CFLAGS/LDFLAGS con pkg-config y luego instala dependencias
+# Actualiza pip y herramientas de construcción, luego instala dependencias
 cmds = [
-  "export MYSQLCLIENT_CFLAGS=\"$(pkg-config mysqlclient --cflags || pkg-config mariadb --cflags)\" && export MYSQLCLIENT_LDFLAGS=\"$(pkg-config mysqlclient --libs || pkg-config mariadb --libs)\" && pip install -r requirements.txt"
+  "pip install --upgrade pip setuptools wheel",
+  "pip install --no-cache-dir -r requirements.txt"
 ]
 
 [start]
-cmd = "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:$PORT --log-file -"
+cmd = "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:$PORT --log-file -"
