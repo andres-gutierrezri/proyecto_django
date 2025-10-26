@@ -2,12 +2,12 @@
 nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
 
 [phases.install]
-# Instala pip usando ensurepip, luego actualiza e instala dependencias
+# Crea entorno virtual y luego instala dependencias en él
 cmds = [
-  "python -m ensurepip --upgrade",
-  "python -m pip install --upgrade pip setuptools wheel",
-  "python -m pip install --no-cache-dir -r requirements.txt"
+  "python -m venv /opt/venv --system-site-packages",
+  "/opt/venv/bin/pip install --upgrade pip setuptools wheel",
+  "/opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
 [start]
-cmd = "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:$PORT --log-file -"
+cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py migrate && /opt/venv/bin/gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:$PORT --log-file -"
