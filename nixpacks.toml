@@ -1,0 +1,23 @@
+[phases.setup]
+nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib"]
+
+[phases.install]
+cmds = [
+    "python -m venv --copies /opt/venv",
+    ". /opt/venv/bin/activate",
+    "pip install --upgrade pip setuptools wheel",
+    "pip install -r requirements.txt"
+]
+
+[start]
+cmd = "python3 manage.py collectstatic --noinput && python3 manage.py makemigrations && python3 manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:$PORT --log-file -"
+```
+
+### **Solución 2: Especificación de Variables de Entorno**
+
+Alternativamente, puede configurar las variables de entorno `MYSQLCLIENT_CFLAGS` y `MYSQLCLIENT_LDFLAGS` directamente en Railway para proporcionar las rutas de compilación necesarias [13][14]. Esta solución es particularmente efectiva cuando el archivo `nixpacks.toml` no resuelve completamente el problema de vinculación de bibliotecas.
+
+En el panel de Railway, agregue las siguientes variables de entorno:
+```
+MYSQLCLIENT_CFLAGS=-I/nix/store/*/include/mysql
+MYSQLCLIENT_LDFLAGS=-L/nix/store/*/lib/mysql -lmysqlclient
