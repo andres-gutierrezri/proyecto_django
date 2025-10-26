@@ -1,1 +1,1 @@
-web: python manage.py collectstatic && python manage.py makemigrations && python manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --log-file -
+web: python manage.py collectstatic && python manage.py makemigrations && python manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:8080 --log-file -
