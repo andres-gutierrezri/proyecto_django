@@ -1,0 +1,109 @@
+{% extends 'proyecto/common/auth_base.html' %}
+{% load static %}
+
+{% block titulo %}
+    Crear Cuenta
+{% endblock %}
+
+{% block description %}
+    Crear Cuenta
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'app_1/css/page_register.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="page-wrapper auth">
+        <div class="page-inner bg-brand-gradient">
+            <div class="page-content-wrapper bg-transparent m-0">
+                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient">
+                    <div class="d-flex align-items-center container p-0">
+                        <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
+                            <a href="{% url 'page_login' %}" class="page-logo-link press-scale-down d-flex align-items-center">
+                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web con Django" aria-roledescription="logo">
+                                <span class="page-logo-text mr-1">Aplicación Web con Django</span>
+                            </a>
+                        </div>
+                        <span class="text-white opacity-50 ml-auto mr-2 hidden-sm-down">
+                            ¿Ya eres miembro?
+                        </span>
+                        <a href="{% url 'page_login' %}" class="btn-link text-white ml-auto ml-sm-0">
+                            Inicio de sesión seguro
+                        </a>
+                    </div>
+                </div>
+                <div class="flex-1" style="background: url({% static 'proyecto/img/svg/pattern-1.svg' %}) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                                    ¡Regístrate ahora, es gratis!
+                                    <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60 hidden-sm-down">
+                                        Tu registro es gratuito por tiempo limitado. Disfruta de esta aplicación en tu móvil, escritorio o tablet.
+                                        <br>¡Está lista para ir donde tú vayas!
+                                    </small>
+                                </h2>
+                            </div>
+                            <div class="col-xl-6 ml-auto mr-auto">
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <div class="alert alert-primary text-dark" role="alert">
+                                        <strong>¡Atención!</strong> Debido a mantenimiento del servidor de 12:00 a.m. a 04:00 a.m. (UTC-5), los correos de verificación podrían retrasarse hasta 10 minutos.
+                                    </div>
+                                    <form id="js-register" novalidate="" action="intel_analytics_dashboard.html">
+                                        <div class="form-group row">
+                                            <label class="col-xl-12 form-label" for="fname">Tu nombre y apellido</label>
+                                            <div class="col-6 pr-1">
+                                                <input type="text" id="fname" class="form-control" placeholder="Nombre" required>
+                                                <div class="invalid-feedback">No, te faltó este campo.</div>
+                                            </div>
+                                            <div class="col-6 pl-1">
+                                                <input type="text" id="lname" class="form-control" placeholder="Apellido" required>
+                                                <div class="invalid-feedback">No, te faltó este campo.</div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="emailverify">El correo electrónico será necesario para verificación y recuperación de cuenta</label>
+                                            <input type="email" id="emailverify" class="form-control" placeholder="Correo para verificación" required>
+                                            <div class="invalid-feedback">No, te faltó este campo.</div>
+                                            <div class="help-block">Tu correo electrónico también será tu nombre de usuario</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="userpassword">Elige una contraseña: <br>No reutilices la contraseña de tu banco, no gastamos mucho en seguridad para esta aplicación.</label>
+                                            <input type="password" id="userpassword" class="form-control" placeholder="mínimo 8 caracteres" required>
+                                            <div class="invalid-feedback">Lo siento, te faltó este campo.</div>
+                                            <div class="help-block">Tu contraseña debe tener entre 8 y 20 caracteres, contener letras y números, y no debe contener espacios, caracteres especiales o emoji.</div>
+                                        </div>
+                                        <div class="form-group demo">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="terms" required>
+                                                <label class="custom-control-label" for="terms"> Acepto los términos y condiciones</label>
+                                                <div class="invalid-feedback">Debes aceptar antes de continuar</div>
+                                            </div>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="newsletter">
+                                                <label class="custom-control-label" for="newsletter">Suscribirme a boletines informativos (no te preocupes, no enviaremos tantos)</label>
+                                            </div>
+                                        </div>
+                                        <div class="row no-gutters">
+                                            <div class="col-md-4 ml-auto text-right">
+                                                <button id="js-register-btn" type="submit" class="btn btn-block btn-danger btn-lg mt-3">Enviar verificación</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-white">
+                        2020 &copy; SmartAdmin by&nbsp;<a href='https://www.gotbootstrap.com' class='text-white opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>gotbootstrap.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'app_1/js/page_register.js' %}"></script>
+{% endblock %}

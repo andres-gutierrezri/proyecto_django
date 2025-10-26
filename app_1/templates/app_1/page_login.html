@@ -20,12 +20,12 @@
                 <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient">
                     <div class="d-flex align-items-center container p-0">
                         <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
-                            <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+                            <a href="{% url 'page_login' %}" class="page-logo-link press-scale-down d-flex align-items-center">
                                 <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web con Django" aria-roledescription="logo">
                                 <span class="page-logo-text mr-1">Aplicación Web con Django</span>
                             </a>
                         </div>
-                        <a href="page_register.html" class="btn-link text-white ml-auto">
+                        <a href="{% url 'page_register' %}" class="btn-link text-white ml-auto">
                             Crear Cuenta
                         </a>
                     </div>
