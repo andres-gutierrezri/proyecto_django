@@ -1,12 +1,13 @@
 [phases.setup]
 nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
+nixLibs = ["mariadb-connector-c"]
 
 [phases.install]
 # Crea entorno virtual y luego instala dependencias en él
 cmds = [
   "python -m venv /opt/venv --system-site-packages",
   "/opt/venv/bin/pip install --upgrade pip setuptools wheel",
-  "MYSQLCLIENT_CFLAGS=\"$(pkg-config --cflags mariadb)\" MYSQLCLIENT_LDFLAGS=\"$(pkg-config --libs mariadb)\" /opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
+  "/opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
 [start]
