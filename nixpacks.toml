@@ -1,13 +1,12 @@
 [phases.setup]
 nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
-nixLibs = ["mariadb-connector-c"]
 
 [phases.install]
 # Crea entorno virtual y luego instala dependencias en él
 cmds = [
   "python -m venv /opt/venv --system-site-packages",
   "/opt/venv/bin/pip install --upgrade pip setuptools wheel",
-  "/opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
+  "export PKG_CONFIG_PATH=\"$HOME/.nix-profile/lib/pkgconfig:$PKG_CONFIG_PATH\" && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
 [start]
