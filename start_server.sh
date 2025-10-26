@@ -16,6 +16,58 @@ if [ ! -f "manage.py" ]; then
 fi
 echo "✅ Estructura del proyecto verificada"
 
+echo "🔍 Detectando y configurando bibliotecas de MySQL..."
+# Buscar instalación de MySQL en ubicaciones comunes de macOS
+MYSQL_BASE_PATHS=(
+    "/usr/local/mysql"
+    "/opt/homebrew/opt/mysql"
+    "/usr/local/opt/mysql"
+    "/opt/homebrew/Cellar/mysql/"*
+    "/usr/local/Cellar/mysql/"*
+)
+
+MYSQL_ROOT=""
+for path_pattern in "${MYSQL_BASE_PATHS[@]}"; do
+    # Expandir patrones con comodines
+    for path in $path_pattern; do
+        if [ -d "$path/lib" ] && [ -f "$path/lib/libmysqlclient.dylib" -o -f "$path/lib/libmysqlclient.24.dylib" ]; then
+            MYSQL_ROOT="$path"
+            break 2
+        fi
+    done
+done
+
+if [ -n "$MYSQL_ROOT" ]; then
+    # Configurar todas las variables de entorno necesarias para MySQL
+    export PATH="$MYSQL_ROOT/bin:$PATH"
+    export MYSQLCLIENT_CFLAGS="-I$MYSQL_ROOT/include"
+    export MYSQLCLIENT_LDFLAGS="-L$MYSQL_ROOT/lib -lmysqlclient"
+    export PKG_CONFIG_PATH="$MYSQL_ROOT/lib/pkgconfig"
+    export DYLD_LIBRARY_PATH="$MYSQL_ROOT/lib:$DYLD_LIBRARY_PATH"
+    export DYLD_FALLBACK_LIBRARY_PATH="$MYSQL_ROOT/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+    
+    echo "✅ MySQL encontrado en: $MYSQL_ROOT"
+    echo "   Variables de entorno configuradas:"
+    echo "   - PATH"
+    echo "   - MYSQLCLIENT_CFLAGS"
+    echo "   - MYSQLCLIENT_LDFLAGS"
+    echo "   - PKG_CONFIG_PATH"
+    echo "   - DYLD_LIBRARY_PATH"
+    echo "   - DYLD_FALLBACK_LIBRARY_PATH"
+else
+    echo "⚠️  No se encontraron bibliotecas de MySQL en ubicaciones estándar"
+    echo "   Si usas MySQL, asegúrate de tener MySQL instalado correctamente"
+    echo "   Puedes instalar MySQL con: brew install mysql"
+    echo ""
+    echo "   O agregar estas variables a tu ~/.zprofile:"
+    echo "   export PATH=\"/usr/local/mysql/bin:\$PATH\""
+    echo "   export MYSQLCLIENT_CFLAGS=\"-I/usr/local/mysql/include\""
+    echo "   export MYSQLCLIENT_LDFLAGS=\"-L/usr/local/mysql/lib -lmysqlclient\""
+    echo "   export PKG_CONFIG_PATH=\"/usr/local/mysql/lib/pkgconfig\""
+    echo "   export DYLD_LIBRARY_PATH=\"/usr/local/mysql/lib:\$DYLD_LIBRARY_PATH\""
+    echo "   export DYLD_FALLBACK_LIBRARY_PATH=\"/usr/local/mysql/lib:\$DYLD_FALLBACK_LIBRARY_PATH\""
+fi
+
 echo "🔍 Verificando entorno virtual..."
 if [ ! -d ".venv" ]; then
     echo "🔨 Creando entorno virtual..."
@@ -35,6 +87,8 @@ if [ -n "$VIRTUAL_ENV" ]; then
 else
     echo "⚠️  Entorno virtual no está activado, se procederá a activarlo:"
     echo "🐍 Activando entorno virtual..."
+    VENV_ACTIVATE_PATH="$(pwd)/.venv/bin/activate"
+    echo "   Ruta de activación: $VENV_ACTIVATE_PATH"
     source .venv/bin/activate
     if [ $? -ne 0 ]; then
         echo "❌ Error al activar entorno virtual"
@@ -42,6 +96,11 @@ else
     fi
     echo "✅ Entorno virtual activado exitosamente"
 fi
+
+echo "📍 Información del entorno virtual:"
+echo "   Ruta: $(pwd)/.venv"
+echo "   Activación manual: source .venv/bin/activate"
+echo "   Python: .venv/bin/python"
 
 echo "🔧 Verificando integridad de pip..."
 .venv/bin/python -c "import pip" 2>/dev/null
@@ -62,6 +121,7 @@ if [ $? -ne 0 ]; then
         exit 1
     fi
     echo "✅ Nuevo entorno virtual creado y activado"
+    echo "📍 Ruta de activación: $(pwd)/.venv/bin/activate"
 else
     echo "✅ Pip funciona correctamente"
     echo "⬆️  Actualizando pip..."
@@ -87,6 +147,14 @@ else
     fi
 fi
 
+echo "🧹 Limpiando caché de pip..."
+pip3 cache purge 2>/dev/null
+if [ $? -eq 0 ]; then
+    echo "✅ Caché de pip limpiado exitosamente"
+else
+    echo "⚠️  No se pudo limpiar el caché de pip (puede ser normal)"
+fi
+
 echo "📦 Instalando dependencias..."
 if [ -f "requirements.txt" ]; then
     echo "🔍 Verificando pip antes de instalar dependencias..."
@@ -100,11 +168,11 @@ if [ -f "requirements.txt" ]; then
         fi
     fi
 
-    echo "📋 Instalando desde requirements.txt..."
-    .venv/bin/python -m pip install -r requirements.txt
+    echo "📋 Instalando desde requirements.txt (sin caché)..."
+    .venv/bin/python -m pip install -r requirements.txt --no-cache-dir
     if [ $? -ne 0 ]; then
-        echo "⚠️  Error en instalación normal, intentando con --no-cache-dir..."
-        .venv/bin/python -m pip install -r requirements.txt --no-cache-dir
+        echo "⚠️  Error en instalación, intentando con reinstalación forzada..."
+        .venv/bin/python -m pip install -r requirements.txt --no-cache-dir --force-reinstall
         if [ $? -ne 0 ]; then
             echo "❌ Error al instalar dependencias"
             echo ""
@@ -145,6 +213,17 @@ else
     echo "⚠️  No se encontró requirements.txt, continuando sin instalar dependencias..."
 fi
 
+echo ""
+echo "📦 Paquetes instalados en el entorno virtual:"
+echo "================================================================"
+.venv/bin/python -m pip list --format=columns 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "⚠️  No se pudo obtener la lista de paquetes"
+else
+    echo "================================================================"
+fi
+echo ""
+
 echo "🔄 Ejecutando construcción de migraciones..."
 .venv/bin/python manage.py makemigrations
 if [ $? -ne 0 ]; then
@@ -161,6 +240,50 @@ fi
 
 echo "✅ Migraciones completadas"
 
+echo "🔍 Verificando importación de MySQLdb..."
+.venv/bin/python -c "import MySQLdb; print('MySQLdb import successful')" 2>/dev/null
+if [ $? -eq 0 ]; then
+    echo "✅ MySQLdb importado exitosamente"
+else
+    echo "⚠️  Advertencia: MySQLdb no pudo ser importado"
+    echo ""
+    echo "💡 Soluciones posibles:"
+    echo "   1. Instalar MySQL:"
+    echo "      brew install mysql"
+    echo ""
+    echo "   2. Agregar variables de entorno de MySQL a ~/.zprofile:"
+    echo "      export PATH=\"/usr/local/mysql/bin:\$PATH\""
+    echo "      export MYSQLCLIENT_CFLAGS=\"-I/usr/local/mysql/include\""
+    echo "      export MYSQLCLIENT_LDFLAGS=\"-L/usr/local/mysql/lib -lmysqlclient\""
+    echo "      export PKG_CONFIG_PATH=\"/usr/local/mysql/lib/pkgconfig\""
+    echo "      export DYLD_LIBRARY_PATH=\"/usr/local/mysql/lib:\$DYLD_LIBRARY_PATH\""
+    echo "      export DYLD_FALLBACK_LIBRARY_PATH=\"/usr/local/mysql/lib:\$DYLD_FALLBACK_LIBRARY_PATH\""
+    echo ""
+    echo "   3. Reinstalar mysqlclient con las variables configuradas:"
+    echo "      source .venv/bin/activate"
+    echo "      pip uninstall mysqlclient -y"
+    echo "      pip install mysqlclient --no-cache-dir"
+    echo ""
+    echo "   4. Si no usas MySQL, puedes cambiar a SQLite en settings.py"
+    echo ""
+    
+    # Intentar detectar si MySQL está instalado
+    if command -v mysql >/dev/null 2>&1; then
+        MYSQL_CONFIG=$(which mysql_config 2>/dev/null)
+        if [ -n "$MYSQL_CONFIG" ]; then
+            MYSQL_LIB=$($MYSQL_CONFIG --libs 2>/dev/null | grep -o '\-L[^ ]*' | sed 's/-L//')
+            if [ -n "$MYSQL_LIB" ]; then
+                MYSQL_BASE=$(dirname "$MYSQL_LIB")
+                echo "   📌 MySQL detectado en: $MYSQL_BASE"
+                echo "   Asegúrate de tener estas variables en tu ~/.zprofile"
+            fi
+        fi
+    else
+        echo "   ⚠️  MySQL no parece estar instalado en el sistema"
+    fi
+    echo ""
+fi
+
 echo "🚀 Iniciando servidor de desarrollo..."
 echo "📍 URL de la aplicación: http://127.0.0.1:8000/"
 echo "⏹️  Presiona Ctrl+C para detener el servidor"
@@ -170,3 +293,11 @@ sleep 3
 open http://127.0.0.1:8000/
 
 .venv/bin/python manage.py runserver 127.0.0.1:8000
+if [ $? -ne 0 ]; then
+    echo "❌ Error al iniciar el servidor de desarrollo"
+    exit 1
+fi
+echo "✅ Servidor de desarrollo detenido"
+echo "================================================================"
+echo "👋 Gracias por usar el iniciador de aplicación Django"
+echo "================================================================"

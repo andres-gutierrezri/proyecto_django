@@ -1,0 +1,29 @@
+body {
+  font-family: 'Roboto', verdana, sans-serif;
+}
+
+/* Tema claro - fondo azul claro (cian) */
+body[data-bs-theme="light"] {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  min-height: 100vh;
+  /* O usar un color sólido: background-color: lightcyan; */
+}
+
+/* Tema oscuro - mantener los colores predeterminados de Bootstrap */
+body[data-bs-theme="dark"] {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  min-height: 100vh;
+}
+
+#logo {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: block;
+    margin: 20px auto;
+}
+
+#logo:hover {
+    /* Opcional: añadir un pequeño efecto de escala al pasar el cursor */
+    transform-origin: center;
+}

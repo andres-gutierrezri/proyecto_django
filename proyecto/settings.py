@@ -10,73 +10,115 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+# Importar os para manejar las variables de entorno
 import os
-from pathlib import Path
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from dotenv import load_dotenv
+from proyecto.local_settings import IS_DEPLOYED, DATABASE_DICT
+from proyecto.logging_settings import *
+from proyecto.cloud_settings import *
+
+# Carga las variables de entorno del archivo .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Construir rutas dentro del proyecto de esta manera: BASE_DIR / 'subdir'.
+# from pathlib import Path
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@%k65fx8-e!5dfn&$#mw-+pxmgdbkn^froofc1x^73csu-)bc+'
+SECRET_KEY = os.getenv("SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Seguridad: no ejecute con depuración activada en producción!
+# Se recomienda que DEBUG sea False en producción
+# Se recomienda que DEBUG sea True en desarrollo
+DEBUG = not IS_DEPLOYED
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# Configuración de la dirección IP y el puerto donde se alojará la aplicación
+HOSTING_IP_PORT = os.getenv("HOSTING_IP_PORT", '0.0.0.0:8080')
+
+# Configuración del dominio donde se alojará la aplicación
+HOSTING_DOMAIN = os.getenv("HOSTING_DOMAIN", "")
+
+# Configuración de la URL de alojamiento de la aplicación
+HOSTING_URL= os.getenv("HOSTING_URL", "")
+
+# Configuración de los hosts permitidos
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', HOSTING_IP_PORT, HOSTING_DOMAIN]
+
+# Configuración de los hosts de confianza para la protección contra falsificación de solicitudes entre sitios (CSRF)
+CSRF_TRUSTED_ORIGINS = ['http://*', HOSTING_URL]  
 
 # Application definition
+# Definición de aplicaciones
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'app_1',
+    'django.contrib.admin', # Administrador de Django
+    'django.contrib.auth', # Autenticación
+    'django.contrib.contenttypes', # Tipos de contenido
+    'django.contrib.sessions', # Sesiones
+    'django.contrib.messages', # Mensajes
+    'django.contrib.staticfiles', # Archivos estáticos
+    'django.contrib.humanize', # Humanizar números
+    'whitenoise.runserver_nostatic', # Whitenoise para archivos estáticos
+    'storages', # Almacenamiento en la nube
+    'app_1', # Primera Aplicación del Proyecto
 ]
 
+# Middleware
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware', # Seguridad
+    'django.contrib.sessions.middleware.SessionMiddleware', # Sesiones
+    'django.middleware.common.CommonMiddleware', # Común (Middleware)
+    'django.middleware.csrf.CsrfViewMiddleware', # Protección contra falsificación de solicitudes entre sitios (CSRF)
+    'django.contrib.auth.middleware.AuthenticationMiddleware', # Autenticación
+    'django.contrib.messages.middleware.MessageMiddleware', # Mensajes
+    'django.middleware.clickjacking.XFrameOptionsMiddleware', # Protección contra ataques de clics en el marco
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise para archivos estáticos
 ]
 
+
+# URL Configuration
+# Configuración de URL
+# https://docs.djangoproject.com/en/5.2/topics/http/urls/
 ROOT_URLCONF = 'proyecto.urls'
 
+# Template Configuration
+# Configuración de plantillas
+# https://docs.djangoproject.com/en/5.2/topics/templates/
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [], # Directorios de plantillas
+        'APP_DIRS': True, # Aplicaciones de plantillas
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug', # Depuración
+                'django.template.context_processors.request', # Solicitudes
+                'django.contrib.auth.context_processors.auth', # Autenticación
+                'django.contrib.messages.context_processors.messages', # Mensajes
             ],
         },
     },
 ]
 
+# WSGI Configuration
+# Configuración de WSGI
 WSGI_APPLICATION = 'proyecto.wsgi.application'
 
 
 # Database
+# Configuración de la base de datos
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': DATABASE_DICT # Base de datos por defecto
 }
 
 
@@ -85,16 +127,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', # Validador de similitud de atributos de usuario
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', # Validador de longitud mínima de contraseña
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', # Validador de contraseña común
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', # Validador de contraseña numérica
     },
 ]
 
@@ -105,6 +147,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-co' # Código de idioma
 
 TIME_ZONE = 'America/Bogota' # Zona horaria
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True # Usar internacionalización
 
@@ -113,22 +156,43 @@ USE_L10N = True # Usar localización
 USE_TZ = True # Usar zona horaria
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-
-# URL para acceder a los archivos estáticos
-STATIC_URL = '/static/'
-
-# Ruta donde se almacenarán los archivos estáticos recolectados
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Directorios adicionales donde buscar archivos estáticos
-STATICFILES_DIRS = [
-    BASE_DIR / 'app_1/static',
-]
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Static files (CSS, JavaScript, Images)
+# Archivos estáticos (CSS, JavaScript, imágenes)
+# Configura la ruta de los archivos estáticos
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATIC_URL = '/staticfiles/' if IS_DEPLOYED else '/static/'
+
+# Directorios adicionales donde buscar archivos estáticos
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'app_1', 'static'),
+]
+
+LOGIN_URL = '/signin'
+
+"""
+# Configuración para almacenar archivos estáticos en S3
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+"""
+
+# Configuración para almacenar archivos multimedia en el sistema de archivos (S3)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if not IS_DEPLOYED:
+    MEDIA_URL = '/media/'
+else:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+    
+# Se define el nombre de la carpeta de archivos públicos para almacenar las imágenes de las caratulas de los libros
+PUBLIC_MEDIA = 'publico'

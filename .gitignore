@@ -211,3 +211,11 @@ database.txt
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# Ignore files for claude.ai/code
+.claude/
+CLAUDE.md
+
+# Ignore files for warp.dev
+.warp/
+WARP.md

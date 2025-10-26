@@ -1,3 +1,187 @@
-# Instalar dependencias
-django==5.2.3
-mysql-connector-python==8.0.33
+# ===========================================
+# DEPENDENCIAS DEL PROYECTO DJANGO
+# ===========================================
+# Este archivo contiene todas las dependencias necesarias para ejecutar
+# el proyecto Django. Instalar con: pip install -r requirements.txt
+# Python 3.9+ requerido para Django 5.2.3
+
+# ===========================================
+# CORE - Dependencias principales de Django
+# ===========================================
+
+# ASGI (Asynchronous Server Gateway Interface) - Servidor asíncrono para Django
+# Proporciona la interfaz estándar entre servidores web asíncronos y aplicaciones Python
+# Necesario para el funcionamiento de Django Channels y aplicaciones asíncronas
+asgiref==3.10.0
+
+# Django Framework - Framework web principal del proyecto
+# Versión 5.2.3 - versión estable y moderna con soporte completo
+# Incluye: ORM, sistema de templates, autenticación, admin panel, etc.
+Django==5.2.3
+
+# SQL Parse - Parser y formateador de consultas SQL
+# Utilizado por Django para parsear, formatear y validar consultas SQL
+# Mejora la legibilidad y debugging de consultas generadas por el ORM
+sqlparse==0.5.3
+
+# Typing Extensions - Extensiones del sistema de tipos de Python
+# Proporciona tipos adicionales para type hints (anotaciones de tipo)
+# Compatible con versiones anteriores de Python que no incluyen ciertos tipos
+typing_extensions==4.15.0
+
+# ===========================================
+# BASE DE DATOS - Conectores y utilidades
+# ===========================================
+
+# MySQL Client - Conector nativo para MySQL/MariaDB
+# Permite a Django conectarse y operar con bases de datos MySQL
+# Mejor rendimiento que PyMySQL (es una extensión C)
+mysqlclient==2.2.7
+
+# PostgreSQL Client - Conector para base de datos PostgreSQL
+# psycopg2-binary incluye las bibliotecas necesarias precompiladas
+# Usar psycopg2-binary para desarrollo, psycopg2 para producción
+psycopg2-binary==2.9.10
+
+# PyMySQL - Conector MySQL puro en Python
+# Alternativa a mysqlclient cuando no se pueden compilar extensiones C
+# Más lento pero más portable entre plataformas
+PyMySQL==1.1.1
+
+# DJ Database URL - Parser de URLs de base de datos
+# Facilita la configuración de bases de datos mediante variables de entorno
+# Formato: DATABASE_URL=mysql://user:pass@host:port/dbname
+dj-database-url==2.3.0
+
+# ===========================================
+# SERVIDOR WEB - Producción y archivos estáticos
+# ===========================================
+
+# Gunicorn - Servidor WSGI HTTP para Python
+# Servidor de producción recomendado para Django en Linux/Unix
+# Maneja múltiples workers y es compatible con async
+gunicorn==23.0.0
+
+# WhiteNoise - Servicio de archivos estáticos
+# Permite servir archivos estáticos directamente desde Django sin nginx
+# Optimizado con compresión y caché para producción
+whitenoise==6.8.2
+
+# ===========================================
+# ALMACENAMIENTO EN LA NUBE - AWS S3
+# ===========================================
+
+# Boto3 - SDK de AWS para Python
+# Cliente oficial para interactuar con servicios de Amazon Web Services
+# Necesario para django-storages con S3
+boto3==1.35.69
+
+# Botocore - Biblioteca base de bajo nivel para AWS
+# Dependencia de boto3, maneja las llamadas HTTP a AWS
+# Actualizado automáticamente con boto3
+botocore==1.35.69
+
+# Django Storages - Backend de almacenamiento para Django
+# Soporte para S3, Google Cloud Storage, Azure, DigitalOcean Spaces, etc.
+# Permite almacenar media y archivos estáticos en la nube
+django-storages==1.14.4
+
+# S3 Transfer - Utilidad de transferencia de archivos S3
+# Maneja uploads/downloads de archivos grandes a S3
+# Dependencia de boto3 para transferencias optimizadas
+s3transfer==0.10.4
+
+# ===========================================
+# IMÁGENES Y ARCHIVOS - Procesamiento
+# ===========================================
+
+# Pillow - Biblioteca de procesamiento de imágenes
+# Fork moderno de PIL (Python Imaging Library)
+# Soporta múltiples formatos: JPEG, PNG, GIF, TIFF, etc.
+Pillow==11.0.0
+
+# ReportLab - Generación de archivos PDF
+# Biblioteca completa para crear PDFs con gráficos, tablas, texto, etc.
+# Útil para reportes, facturas, certificados
+reportlab==4.2.5
+
+# XlsxWriter - Generación de archivos Excel (XLSX)
+# Crea archivos Excel con formato, fórmulas, gráficos, etc.
+# Alternativa moderna a xlwt para archivos .xlsx
+XlsxWriter==3.2.0
+
+# ===========================================
+# UTILIDADES Y CONFIGURACIÓN
+# ===========================================
+
+# Python Dotenv - Carga variables de entorno desde archivo .env
+# Facilita la gestión de configuración y secretos en desarrollo
+# Evita hardcodear credenciales en el código
+python-dotenv==1.0.1
+
+# Python DateUtil - Extensiones para manejo de fechas
+# Proporciona parsers y utilidades adicionales para datetime
+# Maneja zonas horarias, deltas relativos, recurrencias
+python-dateutil==2.9.0.post0
+
+# TOML - Parser para archivos TOML (Tom's Obvious Minimal Language)
+# Formato de configuración moderno usado por pyproject.toml
+# Incluido en Python 3.11+, necesario para versiones anteriores
+tomli==2.2.1
+
+# ===========================================
+# HERRAMIENTAS DE DESARROLLO
+# ===========================================
+
+# Autopep8 - Formateador automático de código Python
+# Formatea código siguiendo PEP 8 (guía de estilo de Python)
+# Útil para mantener consistencia en el código
+autopep8==2.3.1
+
+# Pycodestyle - Verificador de estilo PEP 8
+# Comprueba que el código siga las convenciones de Python
+# Usado por autopep8 y otros linters
+pycodestyle==2.12.1
+
+# ===========================================
+# NETWORKING Y SEGURIDAD - HTTP/HTTPS
+# ===========================================
+
+# Requests - Biblioteca HTTP para humanos
+# Cliente HTTP elegante y simple para APIs REST
+# Maneja autenticación, sesiones, cookies, etc.
+requests==2.32.3
+
+# Certifi - Certificados SSL de Mozilla
+# Proporciona certificados CA raíz actualizados
+# Necesario para validar conexiones HTTPS
+certifi==2024.8.30
+
+# Urllib3 - Cliente HTTP de bajo nivel
+# Dependencia de requests, maneja pools de conexiones
+# Soporta retry, timeout, SSL/TLS
+urllib3==2.2.3
+
+# Charset Normalizer - Detección de codificación de caracteres
+# Reemplazo moderno de chardet con mejor precisión
+# Usado por requests para detectar encoding de respuestas
+charset-normalizer==3.4.0
+
+# IDNA - Internacionalized Domain Names in Applications
+# Soporte para dominios internacionalizados (caracteres Unicode)
+# Necesario para URLs con caracteres no ASCII
+idna==3.10
+
+# ===========================================
+# UTILIDADES AWS
+# ===========================================
+
+# JMESPath - Query language para JSON
+# Permite extraer datos de estructuras JSON complejas
+# Usado por boto3 para filtrar respuestas de AWS
+jmespath==1.0.1
+
+# Docutils - Sistema de procesamiento de documentación
+# Parser para reStructuredText (rST)
+# Dependencia de botocore para documentación
+docutils==0.21.2

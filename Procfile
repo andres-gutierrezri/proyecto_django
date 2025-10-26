@@ -1,0 +1,1 @@
+web: python3 manage.py collectstatic && python3 manage.py makemigrations && python3 manage.py migrate && gunicorn proyecto.wsgi:application --workers 3 --log-file -
