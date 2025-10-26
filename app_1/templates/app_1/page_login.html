@@ -1,0 +1,115 @@
+{% extends 'proyecto/common/auth_base.html' %}
+{% load static %}
+
+{% block titulo %}
+    Iniciar Sesión
+{% endblock %}
+
+{% block description %}
+    Iniciar Sesión
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'app_1/css/page_login.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="page-wrapper auth">
+        <div class="page-inner bg-brand-gradient">
+            <div class="page-content-wrapper bg-transparent m-0">
+                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient">
+                    <div class="d-flex align-items-center container p-0">
+                        <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
+                            <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web con Django" aria-roledescription="logo">
+                                <span class="page-logo-text mr-1">Aplicación Web con Django</span>
+                            </a>
+                        </div>
+                        <a href="page_register.html" class="btn-link text-white ml-auto">
+                            Crear Cuenta
+                        </a>
+                    </div>
+                </div>
+                <div class="flex-1" style="background: url({% static 'proyecto/img/svg/pattern-1.svg' %}) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col col-md-6 col-lg-7 hidden-sm-down">
+                                <h2 class="fs-xxl fw-500 mt-4 text-white">
+                                    Proyecto profesional configurado para desarrollo y producción con soporte multi-base de datos, despliegue en la nube y sistema de plantillas moderno.
+                                    <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60">
+                                        Aplicación Web con Django 5.2.3 Integrada con Bootstrap 5.3.0, jQuery 3.6.0 DataTables 1.11.5 y más...
+                                    </small>
+                                </h2>
+                                <a href="https://github.com/andres-gutierrezri/proyecto_django/" class="fs-lg fw-500 text-white opacity-70" target="_blank">Saber más &gt;&gt;</a>
+                                <div class="d-sm-flex flex-column align-items-center justify-content-center d-md-block">
+                                    <div class="px-0 py-1 mt-5 text-white fs-nano opacity-50">
+                                        Encuéntranos en redes sociales
+                                    </div>
+                                    <div class="d-flex flex-row opacity-70">
+                                        <a href="https://www.facebook.com/" class="mr-2 fs-xxl text-white" target="_blank">
+                                            <i class="fab fa-facebook-square"></i>
+                                        </a>
+                                        <a href="https://www.instagram.com/" class="mr-2 fs-xxl text-white" target="_blank">
+                                            <i class="fab fa-instagram"></i>
+                                        </a>
+                                        <a href="https://x.com/" class="mr-2 fs-xxl text-white" target="_blank">
+                                            <i class="fab fa-twitter-square"></i>
+                                        </a>
+                                        <a href="https://mail.google.com/" class="mr-2 fs-xxl text-white" target="_blank">
+                                            <i class="fab fa-google"></i>
+                                        </a>
+                                        <a href="https://www.linkedin.com/" class="mr-2 fs-xxl text-white" target="_blank">
+                                            <i class="fab fa-linkedin"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4 ml-auto">
+                                <h1 class="text-white fw-300 mb-3 d-sm-block d-md-none">
+                                    Inicio de sesión seguro
+                                </h1>
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <form id="js-login" novalidate="" action="intel_analytics_dashboard.html">
+                                        <div class="form-group">
+                                            <label class="form-label" for="username">Usuario</label>
+                                            <input type="email" id="username" class="form-control form-control-lg" placeholder="tu correo electrónico" value="username@example.com" required style="color: rgba(0, 0, 0, 0.5);">
+                                            <div class="invalid-feedback">No, te faltó este campo.</div>
+                                            <div class="help-block">Tu nombre de usuario único para la aplicación</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="password">Contraseña</label>
+                                            <input type="password" id="password" class="form-control form-control-lg" placeholder="contraseña" value="password_1234" required style="color: rgba(0, 0, 0, 0.5);">
+                                            <div class="invalid-feedback">Lo siento, te faltó este campo.</div>
+                                            <div class="help-block">Tu contraseña</div>
+                                        </div>
+                                        <div class="form-group text-left">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="rememberme">
+                                                <label class="custom-control-label" for="rememberme"> Recordarme durante los próximos 30 días</label>
+                                            </div>
+                                        </div>
+                                        <div class="row no-gutters">
+                                            <div class="col-lg-6 pr-lg-1 my-2">
+                                                <button type="submit" class="btn btn-info btn-block btn-lg">Iniciar con <i class="fab fa-google"></i></button>
+                                            </div>
+                                            <div class="col-lg-6 pl-lg-1 my-2">
+                                                <button id="js-login-btn" type="submit" class="btn btn-danger btn-block btn-lg">Inicio seguro</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-white">
+                            2020 &copy; SmartAdmin by&nbsp;<a href='https://www.gotbootstrap.com' class='text-white opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>gotbootstrap.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'app_1/js/page_login.js' %}"></script>
+{% endblock %}

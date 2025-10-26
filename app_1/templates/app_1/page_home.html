@@ -1,4 +1,4 @@
-{% extends 'proyecto/common/base.html' %}
+{% extends 'proyecto/common/project_base.html' %}
 {% load static %}
 
 {% block titulo %}
@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'app_1/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'app_1/css/page_home.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -21,5 +21,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'app_1/js/script.js' %}"></script>
+    <script src="{% static 'app_1/js/page_home.js' %}"></script>
 {% endblock %}
