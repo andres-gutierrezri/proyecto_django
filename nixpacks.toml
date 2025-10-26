@@ -1,13 +1,122 @@
-[phases.setup]
-nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
+# ============================================================================
+# Nixpacks Configuration for Django Project Deployment
+# ============================================================================
+# Este archivo configura el proceso de build y despliegue en Railway/Nixpacks
+# para un proyecto Django 5.2.3 con soporte multi-base de datos.
+#
+# Arquitectura del despliegue:
+# 1. Setup: Instala paquetes del sistema necesarios (Python, PostgreSQL, MySQL, etc.)
+# 2. Install: Crea entorno virtual e instala dependencias de Python
+# 3. Start: Ejecuta comandos de Django y lanza el servidor Gunicorn
+#
+# Documentación: https://nixpacks.com/docs/configuration/file
+# ============================================================================
 
+# ----------------------------------------------------------------------------
+# FASE DE SETUP - Instalación de paquetes del sistema
+# ----------------------------------------------------------------------------
+# Instala los paquetes Nix necesarios para ejecutar la aplicación Django.
+# Estos paquetes proveen las bibliotecas del sistema y herramientas de compilación.
+# ----------------------------------------------------------------------------
+[phases.setup]
+nixPkgs = [
+  "python313",              # Python 3.13.0 - Runtime principal de la aplicación
+  "postgresql_16",          # PostgreSQL 16 - Base de datos recomendada para producción
+  "mysql80",                # MySQL 8.0 - Base de datos alternativa
+  "mariadb-connector-c",    # MariaDB Connector/C - Bibliotecas C para compilar mysqlclient
+  "pkg-config",             # pkg-config - Herramienta para encontrar bibliotecas del sistema
+  "gcc",                    # GNU C Compiler - Necesario para compilar extensiones de Python
+  "zlib"                    # zlib - Biblioteca de compresión usada por varias dependencias
+]
+
+# ----------------------------------------------------------------------------
+# FASE DE INSTALL - Instalación de dependencias de Python
+# ----------------------------------------------------------------------------
+# Crea un entorno virtual aislado e instala todas las dependencias de Python
+# desde requirements.txt. Se usa venv para evitar conflictos con PEP 668.
+# ----------------------------------------------------------------------------
 [phases.install]
-# Crea entorno virtual y luego instala dependencias en él
 cmds = [
+  # 1. Crear entorno virtual con acceso a paquetes del sistema
+  #    --system-site-packages: Permite acceso a bibliotecas Nix si es necesario
   "python -m venv /opt/venv --system-site-packages",
+
+  # 2. Actualizar pip y herramientas de construcción dentro del venv
+  #    pip: Gestor de paquetes de Python (versión más reciente)
+  #    setuptools: Herramientas para instalar paquetes Python
+  #    wheel: Formato de distribución de paquetes Python (instalación más rápida)
   "/opt/venv/bin/pip install --upgrade pip setuptools wheel",
+
+  # 3. Instalar todas las dependencias del proyecto
+  #    PKG_CONFIG_PATH: Configura la ruta donde pkg-config busca archivos .pc
+  #                     Necesario para que mysqlclient encuentre mariadb-connector-c
+  #    --no-cache-dir: No usa caché de pip (ahorra espacio en el build)
   "export PKG_CONFIG_PATH=\"$HOME/.nix-profile/lib/pkgconfig:$PKG_CONFIG_PATH\" && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
+# ----------------------------------------------------------------------------
+# FASE DE START - Comando de inicio de la aplicación
+# ----------------------------------------------------------------------------
+# Ejecuta los comandos necesarios para preparar y lanzar la aplicación Django:
+# 1. collectstatic: Recolecta archivos estáticos a STATIC_ROOT
+# 2. migrate: Aplica migraciones pendientes a la base de datos
+# 3. gunicorn: Inicia el servidor WSGI de producción
+#
+# IMPORTANTE: makemigrations NO se ejecuta en producción (se hace en desarrollo)
+# ----------------------------------------------------------------------------
 [start]
 cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py migrate && /opt/venv/bin/gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:8080 --log-file -"
+
+# Desglose del comando de inicio:
+#
+# /opt/venv/bin/python manage.py collectstatic --noinput
+#   - Recolecta archivos estáticos (CSS, JS, imágenes) al directorio STATIC_ROOT
+#   - --noinput: No solicita confirmación (modo automático)
+#   - WhiteNoise los sirve comprimidos con caché optimizado
+#
+# /opt/venv/bin/python manage.py migrate
+#   - Aplica migraciones de base de datos pendientes
+#   - Se conecta a PostgreSQL o MySQL según DATABASE_SELECTOR
+#   - NOTA: Las migraciones deben estar comiteadas en el repositorio
+#
+# /opt/venv/bin/gunicorn proyecto.wsgi:application
+#   - Inicia el servidor WSGI Gunicorn para servir la aplicación
+#   - --workers 3: Usa 3 procesos worker para manejar requests
+#   - --bind 0.0.0.0:8080: Escucha en todas las interfaces en el puerto 8080
+#   - --log-file -: Envía logs a stdout (visible en Railway)
+#
+# ============================================================================
+# VARIABLES DE ENTORNO REQUERIDAS EN RAILWAY
+# ============================================================================
+# Estas variables deben configurarse en el dashboard de Railway:
+#
+# IS_DEPLOYED=True                      # Activa modo producción (DEBUG=False)
+# SECRET_KEY=<clave-secreta-generada>   # Clave secreta de Django (nunca commitear)
+# DATABASE_SELECTOR=postgresql          # o "mysql" según tu base de datos
+# POSTGRESQL_DATABASE_URL=postgres://user:pass@host:port/dbname
+# # O para MySQL:
+# # MYSQL_DATABASE_URL=mysql://user:pass@host:port/dbname
+#
+# Opcionales (para AWS S3):
+# AWS_ACCESS_KEY_ID=<access-key>
+# AWS_SECRET_ACCESS_KEY=<secret-key>
+# AWS_STORAGE_BUCKET_NAME=<bucket-name>
+# AWS_S3_REGION_NAME=us-east-1
+#
+# ============================================================================
+# NOTAS DE TROUBLESHOOTING
+# ============================================================================
+#
+# Error: "mysqlclient" no compila
+# Solución: Verificar que PKG_CONFIG_PATH esté configurado correctamente
+#
+# Error: "No module named pip"
+# Solución: Usar "python -m venv" en lugar de instalar pip manualmente
+#
+# Error: "externally-managed-environment"
+# Solución: Usar entorno virtual (venv) en lugar de instalar en Python del sistema
+#
+# Error: Build timeout
+# Solución: Verificar que requirements.txt no tenga dependencias innecesarias
+#
+# ============================================================================
