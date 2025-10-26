@@ -1,8 +1,13 @@
 /**
  * Theme Toggle Script
  *
- * Script para cambiar entre modo claro y oscuro en las páginas de autenticación.
- * Proporciona un botón interactivo que alterna entre los temas y guarda la preferencia del usuario.
+ * Script para cambiar entre modo por defecto, claro y oscuro en las páginas de autenticación.
+ * Proporciona un botón interactivo que cicla entre los tres temas y guarda la preferencia del usuario.
+ *
+ * Modos disponibles:
+ * - Default: Sin clases de tema (usa los estilos por defecto de SmartAdmin)
+ * - Light: Clase 'mod-skin-light' aplicada
+ * - Dark: Clase 'mod-skin-dark' aplicada
  *
  * Requisitos:
  * - Elemento con id "theme-toggle" para el botón de cambio
@@ -10,7 +15,7 @@
  * - theme-loader.js debe estar cargado para la función saveSettings
  *
  * @author Proyecto Django
- * @version 1.0.1
+ * @version 1.1.0
  */
 'use strict';
 
@@ -26,31 +31,67 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Actualiza el icono según el tema actual
+     * Obtiene el tema actual
+     * @returns {string} 'default', 'light' o 'dark'
      */
-    function updateThemeIcon() {
+    function getCurrentTheme() {
         if (body.classList.contains('mod-skin-dark')) {
-            themeIcon.className = 'fal fa-sun';
-            themeToggle.title = 'Cambiar a modo claro';
-            console.log('%c🌙 Modo oscuro activo', 'color: #a8c7fa');
+            return 'dark';
+        } else if (body.classList.contains('mod-skin-light')) {
+            return 'light';
         } else {
-            themeIcon.className = 'fal fa-moon';
-            themeToggle.title = 'Cambiar a modo oscuro';
-            console.log('%c☀️ Modo claro activo', 'color: #0d6efd');
+            return 'default';
         }
     }
 
     /**
-     * Alterna entre modo claro y oscuro
+     * Actualiza el icono según el tema actual
+     */
+    function updateThemeIcon() {
+        const currentTheme = getCurrentTheme();
+
+        switch(currentTheme) {
+            case 'dark':
+                themeIcon.className = 'fal fa-adjust';
+                themeToggle.title = 'Cambiar a modo por defecto';
+                console.log('%c🌙 Modo oscuro activo', 'color: #a8c7fa');
+                break;
+            case 'light':
+                themeIcon.className = 'fal fa-moon';
+                themeToggle.title = 'Cambiar a modo oscuro';
+                console.log('%c☀️ Modo claro activo', 'color: #0d6efd');
+                break;
+            case 'default':
+            default:
+                themeIcon.className = 'fal fa-sun';
+                themeToggle.title = 'Cambiar a modo claro';
+                console.log('%c🎨 Modo por defecto activo', 'color: #39a900');
+                break;
+        }
+    }
+
+    /**
+     * Cicla entre los tres modos de tema: default → light → dark → default
      */
     function toggleTheme() {
-        // Alternar clase de tema oscuro
-        if (body.classList.contains('mod-skin-dark')) {
-            body.classList.remove('mod-skin-dark');
-            body.classList.add('mod-skin-light');
-        } else {
-            body.classList.remove('mod-skin-light');
-            body.classList.add('mod-skin-dark');
+        const currentTheme = getCurrentTheme();
+
+        // Remover todas las clases de tema
+        body.classList.remove('mod-skin-dark', 'mod-skin-light');
+
+        // Aplicar el siguiente tema en el ciclo
+        switch(currentTheme) {
+            case 'default':
+                // Default → Light
+                body.classList.add('mod-skin-light');
+                break;
+            case 'light':
+                // Light → Dark
+                body.classList.add('mod-skin-dark');
+                break;
+            case 'dark':
+                // Dark → Default (sin clases)
+                break;
         }
 
         // Actualizar icono

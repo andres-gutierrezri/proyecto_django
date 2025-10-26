@@ -1,8 +1,47 @@
 /*
  * Estilos para la página de login
+ *
+ * Sistema de temas disponibles:
+ * - Modo por defecto: Sin clases adicionales (estilos originales de SmartAdmin)
+ * - Modo claro: Clase 'mod-skin-light' en el body
+ * - Modo oscuro: Clase 'mod-skin-dark' en el body
  */
 
 /* Todos los estilos están definidos en vendors.bundle.css y app.bundle.css */
+
+/* Estilos adicionales para modo claro */
+.mod-skin-light .card {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.mod-skin-light .form-control {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1a1a1a;
+}
+
+.mod-skin-light .form-control::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+.mod-skin-light .form-control:focus {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.25);
+    color: #000000;
+}
+
+.mod-skin-light .form-label {
+    color: #1a1a1a;
+}
+
+.mod-skin-light .help-block {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.mod-skin-light .custom-control-label {
+    color: #1a1a1a;
+}
 
 /* Estilos adicionales para modo oscuro */
 .mod-skin-dark .card {
