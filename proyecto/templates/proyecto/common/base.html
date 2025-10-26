@@ -16,7 +16,7 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
         <!-- Incluir Archivos Estáticos CSS -->
         {% comment %}
-            <link rel="stylesheet" href="{% static 'css/style.css' %}">
+            <link rel="stylesheet" href="{% static 'proyecto/css/style.css' %}">
         {% endcomment %}
         <!-- Incluir Bloque de Estilos -->
         {% block styles %} {% endblock %}
@@ -36,8 +36,8 @@
         {% comment %}
             <script src="{% static 'js/script.js' %}"></script>
         {% endcomment %}
-        <script src="{% static 'js/initializeDataTables.js' %}"></script>
-        <script src="{% static 'js/themeBasedOnPreference.js' %}"></script>
+        <script src="{% static 'proyecto/js/miscellaneous/tables/initializeDataTables.js' %}"></script>
+        <script src="{% static 'proyecto/js/miscellaneous/preferences/themeBasedOnPreference.js' %}"></script>
         <!-- Incluir Bloque de Scripts -->
         {% block scripts %} {% endblock %}
     </body>

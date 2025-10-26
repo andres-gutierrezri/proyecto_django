@@ -95,7 +95,7 @@ ROOT_URLCONF = 'proyecto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [], # Directorios de plantillas
+        'DIRS': [os.path.join(BASE_DIR, 'proyecto/templates')], # Directorios de plantillas
         'APP_DIRS': True, # Aplicaciones de plantillas
         'OPTIONS': {
             'context_processors': [
@@ -184,6 +184,11 @@ LOGIN_URL = '/signin'
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 """
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'proyecto/static'),
+    os.path.join(BASE_DIR, 'app_1', 'static', 'app_1'),
+)
 
 # Configuración para almacenar archivos multimedia en el sistema de archivos (S3)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

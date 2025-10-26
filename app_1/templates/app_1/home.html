@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'proyecto/common/base.html' %}
 {% load static %}
 
 {% block titulo %}
@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/stylesHome.css' %}">
+    <link rel="stylesheet" href="{% static 'app_1/css/styles.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -15,11 +15,11 @@
             <h1>Hola Mundo</h1>
             <p class="lead">¡Bienvenido a mi primer proyecto Django!</p>
             
-            <img id="logo" src="{% static 'img/logoHome.png' %}" alt="Logo" width="200" height="200" class="img-fluid mt-3">
+            <img id="logo" src="{% static 'app_1/img/logo.png' %}" alt="Logo" width="200" height="200" class="img-fluid mt-3">
         </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'js/scriptHome.js' %}"></script>
+    <script src="{% static 'app_1/js/script.js' %}"></script>
 {% endblock %}
