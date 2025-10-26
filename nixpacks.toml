@@ -2,8 +2,9 @@
 nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
 
 [phases.install]
-# Actualiza pip y herramientas de construcción, luego instala dependencias
+# Instala pip usando ensurepip, luego actualiza e instala dependencias
 cmds = [
+  "python -m ensurepip --upgrade",
   "python -m pip install --upgrade pip setuptools wheel",
   "python -m pip install --no-cache-dir -r requirements.txt"
 ]
