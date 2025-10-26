@@ -1,12 +1,13 @@
 [phases.setup]
-nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib"]
+nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib", "mariadb-connector-c"]
 
 [phases.install]
+# Calcula CFLAGS/LDFLAGS con pkg-config y luego instala dependencias
 cmds = [
-    "python -m venv --copies /opt/venv",
-    ". /opt/venv/bin/activate",
-    "pip install --upgrade pip setuptools wheel",
-    "pip install -r requirements.txt"
+  "python -m pip install --upgrade pip",
+  "export MYSQLCLIENT_CFLAGS=\"$(pkg-config mysqlclient --cflags || pkg-config mariadb --cflags)\" && \
+   export MYSQLCLIENT_LDFLAGS=\"$(pkg-config mysqlclient --libs   || pkg-config mariadb --libs)\" && \
+   pip install -r requirements.txt"
 ]
 
 [start]
