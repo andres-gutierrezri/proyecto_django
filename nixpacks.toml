@@ -6,7 +6,7 @@ nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib",
 cmds = [
   "python -m venv /opt/venv --system-site-packages",
   "/opt/venv/bin/pip install --upgrade pip setuptools wheel",
-  "/opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
+  "MYSQLCLIENT_CFLAGS=\"$(pkg-config --cflags mariadb)\" MYSQLCLIENT_LDFLAGS=\"$(pkg-config --libs mariadb)\" /opt/venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
 [start]
