@@ -5,9 +5,7 @@ nixPkgs = ["python313", "postgresql_16", "mysql80", "pkg-config", "gcc", "zlib",
 # Calcula CFLAGS/LDFLAGS con pkg-config y luego instala dependencias
 cmds = [
   "python -m pip install --upgrade pip",
-  "export MYSQLCLIENT_CFLAGS=\"$(pkg-config mysqlclient --cflags || pkg-config mariadb --cflags)\" && \
-   export MYSQLCLIENT_LDFLAGS=\"$(pkg-config mysqlclient --libs   || pkg-config mariadb --libs)\" && \
-   pip install -r requirements.txt"
+  "export MYSQLCLIENT_CFLAGS=\"$(pkg-config mysqlclient --cflags || pkg-config mariadb --cflags)\" && export MYSQLCLIENT_LDFLAGS=\"$(pkg-config mysqlclient --libs || pkg-config mariadb --libs)\" && pip install -r requirements.txt"
 ]
 
 [start]
