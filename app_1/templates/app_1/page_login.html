@@ -21,12 +21,15 @@
                     <div class="d-flex align-items-center container p-0">
                         <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
                             <a href="{% url 'page_login' %}" class="page-logo-link press-scale-down d-flex align-items-center">
-                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web con Django" aria-roledescription="logo">
-                                <span class="page-logo-text mr-1">Aplicación Web con Django</span>
+                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web" aria-roledescription="logo">
+                                <span class="page-logo-text mr-1">Aplicación Web</span>
                             </a>
                         </div>
-                        <a href="{% url 'page_register' %}" class="btn-link text-white ml-auto">
+                        <a href="{% url 'page_register' %}" class="btn-link text-white ml-auto mr-2">
                             Crear Cuenta
+                        </a>
+                        <a href="javascript:void(0);" id="theme-toggle" class="btn-link text-white" title="Cambiar tema">
+                            <i class="fal fa-moon" id="theme-icon"></i>
                         </a>
                     </div>
                 </div>
@@ -72,13 +75,13 @@
                                     <form id="js-login" novalidate="" action="intel_analytics_dashboard.html">
                                         <div class="form-group">
                                             <label class="form-label" for="username">Usuario</label>
-                                            <input type="email" id="username" class="form-control form-control-lg" placeholder="tu correo electrónico" value="username@example.com" required style="color: rgba(0, 0, 0, 0.5);">
+                                            <input type="email" id="username" class="form-control form-control-lg" placeholder="tu correo electrónico" required>
                                             <div class="invalid-feedback">No, te faltó este campo.</div>
                                             <div class="help-block">Tu nombre de usuario único para la aplicación</div>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label" for="password">Contraseña</label>
-                                            <input type="password" id="password" class="form-control form-control-lg" placeholder="contraseña" value="password_1234" required style="color: rgba(0, 0, 0, 0.5);">
+                                            <input type="password" id="password" class="form-control form-control-lg" placeholder="contraseña" required">
                                             <div class="invalid-feedback">Lo siento, te faltó este campo.</div>
                                             <div class="help-block">Tu contraseña</div>
                                         </div>
@@ -112,4 +115,5 @@
 
 {% block scripts %}
     <script src="{% static 'app_1/js/page_login.js' %}"></script>
+    <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
 {% endblock %}

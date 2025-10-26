@@ -21,15 +21,18 @@
                     <div class="d-flex align-items-center container p-0">
                         <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
                             <a href="{% url 'page_login' %}" class="page-logo-link press-scale-down d-flex align-items-center">
-                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web con Django" aria-roledescription="logo">
-                                <span class="page-logo-text mr-1">Aplicación Web con Django</span>
+                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web" aria-roledescription="logo">
+                                <span class="page-logo-text mr-1">Aplicación Web</span>
                             </a>
                         </div>
                         <span class="text-white opacity-50 ml-auto mr-2 hidden-sm-down">
                             ¿Ya eres miembro?
                         </span>
-                        <a href="{% url 'page_login' %}" class="btn-link text-white ml-auto ml-sm-0">
+                        <a href="{% url 'page_login' %}" class="btn-link text-white ml-auto ml-sm-0 mr-2">
                             Inicio de sesión seguro
+                        </a>
+                        <a href="javascript:void(0);" id="theme-toggle" class="btn-link text-white" title="Cambiar tema">
+                            <i class="fal fa-moon" id="theme-icon"></i>
                         </a>
                     </div>
                 </div>
@@ -106,4 +109,5 @@
 
 {% block scripts %}
     <script src="{% static 'app_1/js/page_register.js' %}"></script>
+    <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
 {% endblock %}

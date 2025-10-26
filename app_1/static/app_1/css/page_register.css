@@ -2,5 +2,64 @@
  * Estilos para la página de registro
  */
 
-/* No se requieren estilos personalizados adicionales */
 /* Todos los estilos están definidos en vendors.bundle.css y app.bundle.css */
+
+/* Estilos adicionales para modo oscuro */
+.mod-skin-dark .card {
+    background-color: rgba(40, 40, 40, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.mod-skin-dark .form-control {
+    background-color: rgba(60, 60, 60, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mod-skin-dark .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.mod-skin-dark .form-control:focus {
+    background-color: rgba(70, 70, 70, 0.9);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.mod-skin-dark .form-label {
+    color: #e0e0e0;
+}
+
+.mod-skin-dark .help-block {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mod-skin-dark .custom-control-label {
+    color: #e0e0e0;
+}
+
+.mod-skin-dark .alert-primary {
+    background-color: rgba(13, 110, 253, 0.2);
+    border-color: rgba(13, 110, 253, 0.3);
+    color: #a8c7fa;
+}
+
+/* Transiciones suaves para cambio de tema */
+body,
+.card,
+.form-control,
+.form-label,
+.help-block,
+.alert {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estilo para el botón de cambio de tema */
+#theme-toggle {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1);
+}
