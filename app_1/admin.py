@@ -38,6 +38,13 @@ class CustomUserAdmin(UserAdmin):
                 'email_verification_sent_at'
             )
         }),
+        ('Restablecimiento de Contraseña', {
+            'fields': (
+                'password_reset_token',
+                'password_reset_sent_at'
+            ),
+            'classes': ('collapse',)  # Colapsar por defecto
+        }),
         ('Preferencias', {
             'fields': ('notify_on_login', 'newsletter_subscription')
         }),
