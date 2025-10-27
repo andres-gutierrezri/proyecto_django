@@ -124,3 +124,83 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def send_password_reset_email(user, request):
+    """
+    Envía un email con el enlace para restablecer la contraseña.
+
+    Args:
+        user: Instancia del modelo CustomUser
+        request: Objeto HttpRequest para construir URLs absolutas
+    """
+    # Generar token de restablecimiento
+    token = generate_verification_token()
+    user.password_reset_token = token
+    user.password_reset_sent_at = timezone.now()
+    user.save(update_fields=[
+        'password_reset_token',
+        'password_reset_sent_at'
+    ])
+
+    # Construir URL de restablecimiento
+    reset_url = request.build_absolute_uri(
+        f'/password-reset-confirm/{token}/'
+    )
+
+    # Contexto para el template
+    context = {
+        'user': user,
+        'reset_url': reset_url,
+        'site_name': 'Aplicación Web',
+        'valid_hours': 24,  # El enlace será válido por 24 horas
+    }
+
+    # Renderizar el email HTML
+    html_message = render_to_string(
+        'app_1/emails/password_reset_email.html',
+        context
+    )
+    plain_message = strip_tags(html_message)
+
+    # Enviar el email
+    send_mail(
+        subject='Restablece tu contraseña - Aplicación Web',
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
+
+
+def send_password_changed_email(user):
+    """
+    Envía un email de confirmación cuando la contraseña ha sido cambiada.
+
+    Args:
+        user: Instancia del modelo CustomUser
+    """
+    # Contexto para el template
+    context = {
+        'user': user,
+        'change_time': timezone.now(),
+        'site_name': 'Aplicación Web',
+    }
+
+    # Renderizar el email HTML
+    html_message = render_to_string(
+        'app_1/emails/password_changed_email.html',
+        context
+    )
+    plain_message = strip_tags(html_message)
+
+    # Enviar el email
+    send_mail(
+        subject='Tu contraseña ha sido actualizada - Aplicación Web',
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
+        html_message=html_message,
+        fail_silently=True,  # No fallar si el email no se puede enviar
+    )
