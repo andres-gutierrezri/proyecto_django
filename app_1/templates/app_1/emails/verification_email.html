@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica tu correo electrónico</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">{{ site_name }}</h1>
+    </div>
+
+    <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #667eea;">¡Hola, {{ user.first_name }}!</h2>
+
+        <p>Gracias por registrarte en {{ site_name }}. Para completar tu registro, por favor verifica tu correo electrónico haciendo clic en el botón de abajo:</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ verification_url }}" style="background-color: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Verificar mi correo electrónico
+            </a>
+        </div>
+
+        <p>O copia y pega este enlace en tu navegador:</p>
+        <p style="background-color: #e9ecef; padding: 10px; border-radius: 5px; word-break: break-all;">
+            {{ verification_url }}
+        </p>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <p style="color: #666; font-size: 12px;">
+                <strong>Nota importante:</strong> Debido a mantenimiento del servidor de 12:00 a.m. a 04:00 a.m. (UTC-5),
+                los correos de verificación podrían retrasarse hasta 10 minutos.
+            </p>
+            <p style="color: #666; font-size: 12px;">
+                Si no te registraste en {{ site_name }}, por favor ignora este correo.
+            </p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+        <p>&copy; 2020 {{ site_name }}. Todos los derechos reservados.</p>
+    </div>
+</body>
+</html>
