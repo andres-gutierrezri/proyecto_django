@@ -1,0 +1,119 @@
+{% extends 'proyecto/common/auth_base.html' %}
+{% load static %}
+
+{% block titulo %}
+    Dashboard
+{% endblock %}
+
+{% block description %}
+    Panel de control del usuario
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'app_1/css/page_login.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="page-wrapper auth">
+        <div class="page-inner bg-brand-gradient">
+            <div class="page-content-wrapper bg-transparent m-0">
+                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient">
+                    <div class="d-flex align-items-center container p-0">
+                        <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
+                            <a href="{% url 'dashboard' %}" class="page-logo-link press-scale-down d-flex align-items-center">
+                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web" aria-roledescription="logo">
+                                <span class="page-logo-text mr-1">Aplicación Web</span>
+                            </a>
+                        </div>
+                        <a href="{% url 'logout' %}" class="btn-link text-white ml-auto mr-2">
+                            Cerrar Sesión
+                        </a>
+                        <a href="javascript:void(0);" id="theme-toggle" class="btn-link text-white" title="Cambiar tema">
+                            <i class="fal fa-moon" id="theme-icon"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="flex-1" style="background: url({% static 'proyecto/img/svg/pattern-1.svg' %}) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                                    ¡Bienvenido, {{ user.get_full_name }}!
+                                    <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60">
+                                        Has iniciado sesión exitosamente en la aplicación.
+                                    </small>
+                                </h2>
+                            </div>
+                            <div class="col-xl-8 ml-auto mr-auto">
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <h3 class="mb-4">Información de tu cuenta</h3>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Nombre completo</label>
+                                                <p class="form-control-plaintext">{{ user.get_full_name }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Correo electrónico</label>
+                                                <p class="form-control-plaintext">{{ user.email }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Estado de verificación</label>
+                                                <p class="form-control-plaintext">
+                                                    {% if user.email_verified %}
+                                                        <span class="badge badge-success">Verificado</span>
+                                                    {% else %}
+                                                        <span class="badge badge-warning">No verificado</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Miembro desde</label>
+                                                <p class="form-control-plaintext">{{ user.date_joined|date:"d/m/Y" }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Suscripción al boletín</label>
+                                                <p class="form-control-plaintext">
+                                                    {% if user.newsletter_subscription %}
+                                                        <span class="badge badge-info">Suscrito</span>
+                                                    {% else %}
+                                                        <span class="badge badge-secondary">No suscrito</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info mt-3" role="alert">
+                                        <strong>Nota:</strong> Este es tu panel de control. Aquí podrás gestionar tu cuenta y acceder a las funcionalidades de la aplicación.
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <a href="{% url 'logout' %}" class="btn btn-danger">
+                                            <i class="fal fa-sign-out"></i> Cerrar Sesión
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-white">
+                            2020 &copy; SmartAdmin by&nbsp;<a href='https://www.gotbootstrap.com' class='text-white opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>gotbootstrap.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
+{% endblock %}

@@ -53,44 +53,126 @@
                                     <div class="alert alert-primary text-dark" role="alert">
                                         <strong>¡Atención!</strong> Debido a mantenimiento del servidor de 12:00 a.m. a 04:00 a.m. (UTC-5), los correos de verificación podrían retrasarse hasta 10 minutos.
                                     </div>
-                                    <form id="js-register" novalidate="" action="intel_analytics_dashboard.html">
+
+                                    <!-- Mensajes de Django -->
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <form id="js-register" method="post" novalidate>
+                                        {% csrf_token %}
+
                                         <div class="form-group row">
-                                            <label class="col-xl-12 form-label" for="fname">Tu nombre y apellido</label>
+                                            <label class="col-xl-12 form-label">Tu nombre y apellido</label>
                                             <div class="col-6 pr-1">
-                                                <input type="text" id="fname" class="form-control" placeholder="Nombre" required>
-                                                <div class="invalid-feedback">No, te faltó este campo.</div>
+                                                {{ form.first_name }}
+                                                {% if form.first_name.errors %}
+                                                    <div class="text-danger">
+                                                        {% for error in form.first_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                             <div class="col-6 pl-1">
-                                                <input type="text" id="lname" class="form-control" placeholder="Apellido" required>
-                                                <div class="invalid-feedback">No, te faltó este campo.</div>
+                                                {{ form.last_name }}
+                                                {% if form.last_name.errors %}
+                                                    <div class="text-danger">
+                                                        {% for error in form.last_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
+
                                         <div class="form-group">
-                                            <label class="form-label" for="emailverify">El correo electrónico será necesario para verificación y recuperación de cuenta</label>
-                                            <input type="email" id="emailverify" class="form-control" placeholder="Correo para verificación" required>
-                                            <div class="invalid-feedback">No, te faltó este campo.</div>
-                                            <div class="help-block">Tu correo electrónico también será tu nombre de usuario</div>
+                                            <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                            {{ form.email }}
+                                            {% if form.email.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in form.email.errors %}
+                                                        {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if form.email.help_text %}
+                                                <div class="help-block">{{ form.email.help_text }}</div>
+                                            {% endif %}
                                         </div>
+
                                         <div class="form-group">
-                                            <label class="form-label" for="userpassword">Elige una contraseña: <br>No reutilices la contraseña de tu banco, no gastamos mucho en seguridad para esta aplicación.</label>
-                                            <input type="password" id="userpassword" class="form-control" placeholder="mínimo 8 caracteres" required>
-                                            <div class="invalid-feedback">Lo siento, te faltó este campo.</div>
-                                            <div class="help-block">Tu contraseña debe tener entre 8 y 20 caracteres, contener letras y números, y no debe contener espacios, caracteres especiales o emoji.</div>
+                                            <label class="form-label" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                                            {{ form.password1 }}
+                                            {% if form.password1.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in form.password1.errors %}
+                                                        {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if form.password1.help_text %}
+                                                <div class="help-block">{{ form.password1.help_text }}</div>
+                                            {% endif %}
                                         </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                                            {{ form.password2 }}
+                                            {% if form.password2.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in form.password2.errors %}
+                                                        {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if form.password2.help_text %}
+                                                <div class="help-block">{{ form.password2.help_text }}</div>
+                                            {% endif %}
+                                        </div>
+
                                         <div class="form-group demo">
                                             <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="terms" required>
-                                                <label class="custom-control-label" for="terms"> Acepto los términos y condiciones</label>
-                                                <div class="invalid-feedback">Debes aceptar antes de continuar</div>
+                                                {{ form.terms_accepted }}
+                                                <label class="custom-control-label" for="{{ form.terms_accepted.id_for_label }}">
+                                                    {{ form.terms_accepted.label }}
+                                                </label>
+                                                {% if form.terms_accepted.errors %}
+                                                    <div class="text-danger">
+                                                        {% for error in form.terms_accepted.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                             <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="newsletter">
-                                                <label class="custom-control-label" for="newsletter">Suscribirme a boletines informativos (no te preocupes, no enviaremos tantos)</label>
+                                                {{ form.newsletter_subscription }}
+                                                <label class="custom-control-label" for="{{ form.newsletter_subscription.id_for_label }}">
+                                                    {{ form.newsletter_subscription.label }}
+                                                </label>
                                             </div>
                                         </div>
+
+                                        {% if form.non_field_errors %}
+                                            <div class="alert alert-danger">
+                                                {% for error in form.non_field_errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+
                                         <div class="row no-gutters">
                                             <div class="col-md-4 ml-auto text-right">
-                                                <button id="js-register-btn" type="submit" class="btn btn-block btn-danger btn-lg mt-3">Enviar verificación</button>
+                                                <button id="js-register-btn" type="submit" class="btn btn-block btn-danger btn-lg mt-3">
+                                                    Registrarse
+                                                </button>
                                             </div>
                                         </div>
                                     </form>
