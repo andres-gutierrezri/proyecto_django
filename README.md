@@ -5,6 +5,7 @@ Proyecto Django profesional configurado para desarrollo y producción con soport
 ## 🚀 Características
 
 - **Django 5.2.3** con Python 3.13.0
+- **Sistema de autenticación completo**: Registro, login, verificación de email, protección de vistas
 - **Multi-base de datos**: PostgreSQL, MySQL con selector dinámico
 - **Servidor de producción**: Gunicorn con 3 workers
 - **Archivos estáticos**: WhiteNoise con compresión y caché
@@ -16,6 +17,7 @@ Proyecto Django profesional configurado para desarrollo y producción con soport
 - **Scripts de inicio**: Automatización completa del entorno
 - **Despliegue cloud**: Compatible con Heroku, Render, Railway
 - **Localización**: Español Colombia (es-co), Zona horaria America/Bogota
+- **Seguridad**: Contraseñas cifradas, protección CSRF, validación compleja de contraseñas
 
 ## 📋 Requisitos
 
@@ -122,36 +124,65 @@ proyecto_django/
 │   ├── cloud_settings.py       # Configuración AWS S3
 │   ├── logging_settings.py     # Sistema de logging
 │   ├── urls.py                 # URLs raíz
-│   └── wsgi.py                 # Punto de entrada WSGI
+│   ├── wsgi.py                 # Punto de entrada WSGI
+│   ├── static/                 # Archivos estáticos del proyecto
+│   └── templates/              # Plantillas del proyecto
+│       └── common/
+│           └── auth_base.html  # Base para autenticación
 ├── app_1/                      # Aplicación principal
-│   ├── templates/              # Plantillas HTML
-│   │   ├── base.html           # Plantilla base (Bootstrap 5)
-│   │   └── index.html          # Página principal
-│   ├── static/                 # Archivos estáticos
-│   │   ├── css/styles.css
-│   │   ├── js/script.js
-│   │   ├── js/initializeDataTables.js
-│   │   ├── js/themeBasedOnPreference.js
-│   │   └── img/logo.png
-│   ├── models.py               # Modelos de BD
-│   ├── views.py                # Vistas
-│   ├── urls.py                 # URLs de la app
-│   └── admin.py                # Admin panel
+│   ├── models.py               # CustomUser y otros modelos
+│   ├── forms.py                # Formularios de autenticación
+│   ├── validators.py           # Validadores personalizados
+│   ├── views.py                # Vistas de autenticación
+│   ├── utils.py                # Utilidades de email
+│   ├── urls.py                 # URLs de la aplicación
+│   ├── admin.py                # Admin personalizado
+│   ├── templates/app_1/        # Plantillas de la app
+│   │   ├── page_login.html     # Página de login
+│   │   ├── page_register.html  # Página de registro
+│   │   ├── dashboard.html      # Dashboard de usuario
+│   │   └── emails/             # Templates de email
+│   │       ├── verification_email.html
+│   │       └── login_notification.html
+│   ├── static/app_1/           # Archivos estáticos
+│   │   ├── css/
+│   │   │   ├── page_login.css
+│   │   │   └── page_register.css
+│   │   ├── js/
+│   │   │   ├── page_login.js
+│   │   │   ├── page_register.js
+│   │   │   ├── initializeDataTables.js
+│   │   │   └── themeBasedOnPreference.js
+│   │   └── img/
+│   │       └── logo.png
+│   └── migrations/             # Migraciones de BD
+│       └── 0001_initial.py     # Migración inicial CustomUser
 ├── SQL/MySQL/                  # Scripts SQL
+│   ├── CreateDB.sql
+│   ├── DeleteTables.sql
+│   ├── DropDB.sql
+│   ├── InsertTables.sql
+│   └── QueriesDB.sql
 ├── tmp/                        # Archivos temporales
 │   └── django.log              # Logs de Django
-├── Procfile                    # Config para despliegue cloud
-├── runtime.txt                 # Versión de Python (3.13.0)
-├── requirements.txt            # Dependencias (187 paquetes)
 ├── .env                        # Variables de entorno (no commitear)
+├── .gitignore                  # Archivos ignorados por Git
+├── Procfile                    # Config Heroku/Render
+├── nixpacks.toml               # Config Railway/Nixpacks
+├── runtime.txt                 # Versión Python (3.13.0)
+├── requirements.txt            # Dependencias (187 paquetes)
+├── manage.py                   # Script de gestión Django
 ├── start_server.bat            # Script inicio Windows
 ├── start_server.sh             # Script inicio macOS/Linux
-└── start_server.py             # Script inicio multiplataforma
+├── start_server.py             # Script inicio multiplataforma
+├── README.md                   # Documentación principal
+├── CLAUDE.md                   # Guía para Claude Code
+└── WARP.md                     # Guía para WARP
 ```
 
 ## 🔧 Configuración de Variables de Entorno
 
-Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
+El proyecto incluye un archivo [.env](.env) de ejemplo con todas las variables necesarias completamente documentadas. Configura las siguientes variables según tu entorno:
 
 ```bash
 # Configuración General
@@ -183,9 +214,23 @@ AWS_ACCESS_KEY_ID=tu-access-key
 AWS_SECRET_ACCESS_KEY=tu-secret-key
 AWS_STORAGE_BUCKET_NAME=tu-bucket
 AWS_S3_REGION_NAME=us-east-1
+
+# Configuración de Email (Sistema de Autenticación)
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend  # Desarrollo
+# EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend  # Producción
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=tu-email@gmail.com
+EMAIL_HOST_PASSWORD=tu-contraseña-de-aplicación-de-google
+DEFAULT_FROM_EMAIL=tu-email@gmail.com
 ```
 
-**⚠️ Importante**: El archivo `.env` está en `.gitignore` y no debe ser commiteado al repositorio.
+**⚠️ Importante**:
+- El archivo `.env` está en `.gitignore` y NO debe ser commiteado al repositorio
+- El proyecto ya incluye un archivo `.env` de ejemplo con todas las variables documentadas
+- Para Gmail, genera una "Contraseña de aplicación" en https://myaccount.google.com/apppasswords
+- Consulta el archivo [.env](.env) para ver la documentación completa de cada variable
 
 ## 📦 Instalación
 
@@ -348,9 +393,301 @@ python3 manage.py runserver       # macOS/Linux
 
 ### Acceder a la Aplicación
 
-- **Página principal**: http://127.0.0.1:8000/app_1/
+- **Página de login**: http://127.0.0.1:8000/ o http://127.0.0.1:8000/login/
+- **Página de registro**: http://127.0.0.1:8000/register/
+- **Dashboard (requiere login)**: http://127.0.0.1:8000/dashboard/
 - **Panel de administración**: http://127.0.0.1:8000/admin/
 - **Logs**: Revisa `tmp/django.log` para logs detallados
+
+## 🔐 Sistema de Autenticación
+
+El proyecto incluye un sistema completo de autenticación de usuarios listo para usar.
+
+### Características del Sistema de Autenticación
+
+1. **Registro de Usuarios**
+   - ✅ Email como nombre de usuario único
+   - ✅ Validación compleja de contraseñas (8-20 caracteres, mayúsculas, minúsculas, caracteres especiales)
+   - ✅ Verificación de términos y condiciones
+   - ✅ Opción de suscripción a newsletter
+   - ✅ Envío automático de email de verificación
+
+2. **Inicio de Sesión**
+   - ✅ Autenticación con email y contraseña
+   - ✅ Opción "Recordarme" (sesión de 30 días)
+   - ✅ Notificación por email al iniciar sesión
+   - ✅ Mensajes contextuales (usuario no registrado, contraseña incorrecta, cuenta inactiva)
+
+3. **Seguridad**
+   - ✅ Contraseñas cifradas con sistema de Django
+   - ✅ Protección CSRF en todos los formularios
+   - ✅ Validación de contraseñas: mínimo 8 caracteres, letra mayúscula, minúscula, carácter especial
+   - ✅ Sin espacios ni emojis en contraseñas
+   - ✅ Tokens seguros para verificación de email
+
+4. **Protección de Vistas**
+   - ✅ Decorador `@login_required` para vistas protegidas
+   - ✅ Redirección automática al login si no autenticado
+   - ✅ Dashboard accesible solo para usuarios autenticados
+
+### Estructura de Archivos de Autenticación
+
+```
+app_1/
+├── models.py                   # CustomUser (extiende AbstractUser)
+├── forms.py                    # Formularios de registro y login
+├── validators.py               # PasswordComplexityValidator
+├── views.py                    # Vistas de autenticación
+├── utils.py                    # Utilidades de email
+├── admin.py                    # Admin personalizado para CustomUser
+├── templates/app_1/
+│   ├── page_login.html         # Formulario de login
+│   ├── page_register.html      # Formulario de registro
+│   ├── dashboard.html          # Panel de usuario
+│   └── emails/
+│       ├── verification_email.html     # Email de verificación
+│       └── login_notification.html     # Email de notificación
+└── urls.py                     # URLs de autenticación
+```
+
+### Modelo CustomUser
+
+El proyecto usa un modelo de usuario personalizado ([app_1/models.py](app_1/models.py)) con campos adicionales:
+
+- `email` - Correo electrónico único (usado como username)
+- `first_name` - Nombre (obligatorio)
+- `last_name` - Apellido (obligatorio)
+- `email_verified` - Estado de verificación de email
+- `email_verification_token` - Token de verificación
+- `notify_on_login` - Preferencia de notificaciones
+- `terms_accepted` - Aceptación de términos
+- `newsletter_subscription` - Suscripción al boletín
+
+### Configuración de Email
+
+Por defecto, los emails se muestran en la consola del servidor (modo desarrollo). Para enviar emails reales en producción:
+
+**Agregar al archivo `.env`:**
+
+```bash
+# Configuración de Email para Gmail
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=tu-email@gmail.com
+EMAIL_HOST_PASSWORD=tu-contraseña-de-aplicación-de-google
+DEFAULT_FROM_EMAIL=tu-email@gmail.com
+```
+
+**Importante**:
+- Para Gmail, genera una "Contraseña de aplicación" en https://myaccount.google.com/apppasswords
+- NO uses tu contraseña normal de Gmail
+- Activa la verificación en dos pasos primero
+
+### Uso del Sistema de Autenticación
+
+#### 1. Registrar un Nuevo Usuario
+
+```bash
+# 1. Navegar a la página de registro
+http://127.0.0.1:8000/register/
+
+# 2. Completar el formulario:
+#    - Nombre y apellido
+#    - Email válido (será tu username)
+#    - Contraseña (mínimo 8 caracteres, mayúscula, minúscula, carácter especial)
+#    - Aceptar términos y condiciones
+
+# 3. El sistema enviará un email de verificación
+#    En desarrollo: Revisar la consola del servidor
+#    En producción: Revisar el correo electrónico
+
+# 4. Hacer clic en el enlace de verificación
+```
+
+#### 2. Iniciar Sesión
+
+```bash
+# 1. Navegar a la página de login
+http://127.0.0.1:8000/login/
+
+# 2. Ingresar:
+#    - Email registrado
+#    - Contraseña
+
+# 3. Opcional: Marcar "Recordarme" para sesión de 30 días
+
+# 4. Tras iniciar sesión:
+#    - Redirección al dashboard
+#    - Email de notificación (si está configurado)
+```
+
+#### 3. Acceder al Dashboard
+
+Una vez autenticado, accede a tu panel de usuario:
+
+```bash
+http://127.0.0.1:8000/dashboard/
+```
+
+Aquí verás:
+- Información de tu cuenta
+- Estado de verificación de email
+- Preferencias de newsletter
+- Opción para cerrar sesión
+
+#### 4. Panel de Administración
+
+Para gestionar usuarios desde el admin de Django:
+
+```bash
+# 1. Crear un superusuario
+source .venv/bin/activate
+python3 manage.py createsuperuser  # macOS/Linux
+python manage.py createsuperuser   # Windows
+
+# 2. Acceder al panel de administración
+http://127.0.0.1:8000/admin/
+
+# 3. Gestionar usuarios, permisos y más
+```
+
+### Validación de Contraseñas
+
+El sistema valida contraseñas con requisitos estrictos ([app_1/validators.py](app_1/validators.py)):
+
+```python
+✅ Mínimo 8 caracteres
+✅ Máximo 20 caracteres
+✅ Al menos una letra mayúscula (A-Z)
+✅ Al menos una letra minúscula (a-z)
+✅ Al menos un carácter especial (!@#$%^&*()_+-=[]{}|;:,.<>?)
+❌ Sin espacios
+❌ Sin emojis
+```
+
+**Ejemplos:**
+- ✅ `MiPass123!` - Válida
+- ✅ `Secure@2025` - Válida
+- ❌ `password` - Sin mayúscula ni carácter especial
+- ❌ `PASSWORD123` - Sin minúscula ni carácter especial
+- ❌ `Pass 123!` - Contiene espacio
+
+### Mensajes de Error y Validación
+
+#### En Registro:
+- **Email duplicado**: "Ya existe un usuario con este correo electrónico"
+- **Contraseña débil**: Mensajes específicos del validador que falle
+- **Términos no aceptados**: "Debes aceptar antes de continuar"
+
+#### En Login:
+- **Email no registrado**: "No existe una cuenta con este correo electrónico. ¿Deseas registrarte?"
+- **Contraseña incorrecta**: "Contraseña incorrecta"
+- **Cuenta inactiva**: "Tu cuenta está inactiva. Por favor contacta al soporte"
+
+### Proteger Vistas Personalizadas
+
+Para proteger tus propias vistas y requerir autenticación:
+
+```python
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+@login_required
+def mi_vista_protegida(request):
+    """
+    Solo usuarios autenticados pueden acceder.
+    Redirige al login si no están autenticados.
+    """
+    context = {
+        'usuario': request.user,
+    }
+    return render(request, 'mi_template.html', context)
+```
+
+### URLs de Autenticación
+
+Las siguientes rutas están disponibles ([app_1/urls.py](app_1/urls.py)):
+
+| URL | Nombre | Descripción |
+|-----|--------|-------------|
+| `/` | `page_login` | Página de inicio de sesión |
+| `/login/` | `login` | Página de inicio de sesión (alternativa) |
+| `/register/` | `page_register` | Página de registro |
+| `/logout/` | `logout` | Cerrar sesión |
+| `/verify-email/<token>/` | `verify_email` | Verificar email con token |
+| `/dashboard/` | `dashboard` | Panel de usuario (protegido) |
+
+### Emails del Sistema
+
+El sistema envía dos tipos de emails automáticamente:
+
+#### 1. Email de Verificación
+- **Cuándo**: Al registrarse un nuevo usuario
+- **Contenido**: Enlace de verificación con token único
+- **Plantilla**: [app_1/templates/app_1/emails/verification_email.html](app_1/templates/app_1/emails/verification_email.html)
+- **Diseño**: HTML con gradiente morado, responsive
+
+#### 2. Email de Notificación de Login
+- **Cuándo**: Al iniciar sesión (si está activado en preferencias)
+- **Contenido**: Fecha, hora, IP, dispositivo
+- **Plantilla**: [app_1/templates/app_1/emails/login_notification.html](app_1/templates/app_1/emails/login_notification.html)
+- **Propósito**: Seguridad y notificación de actividad
+
+### Personalización
+
+Puedes personalizar el sistema de autenticación:
+
+**Cambiar los templates:**
+```bash
+app_1/templates/app_1/
+├── page_login.html      # Diseño del formulario de login
+├── page_register.html   # Diseño del formulario de registro
+└── dashboard.html       # Diseño del panel de usuario
+```
+
+**Modificar validadores:**
+```python
+# app_1/validators.py
+class PasswordComplexityValidator:
+    def validate(self, password, user=None):
+        # Personaliza las reglas de validación
+        pass
+```
+
+**Cambiar emails:**
+```bash
+app_1/templates/app_1/emails/
+├── verification_email.html     # Email de verificación
+└── login_notification.html     # Email de notificación
+```
+
+### Consideraciones de Seguridad
+
+1. **Contraseñas**: Se cifran automáticamente con el sistema de Django (PBKDF2)
+2. **Tokens**: Generados con `secrets.token_urlsafe(32)` - criptográficamente seguros
+3. **CSRF**: Protección activa en todos los formularios con `{% csrf_token %}`
+4. **Sesiones**: Configurables (30 días con "Recordarme", expiran al cerrar navegador sin marcar)
+5. **HTTPS**: Recomendado para producción (SSL automático en Railway, Heroku, Render)
+
+### OAuth con Google (Futuro)
+
+Para implementar autenticación con Google OAuth:
+
+1. Instalar `django-allauth`:
+   ```bash
+   pip install django-allauth
+   ```
+
+2. Configurar en `settings.py`:
+   ```python
+   INSTALLED_APPS += ['allauth', 'allauth.account', 'allauth.socialaccount', 'allauth.socialaccount.providers.google']
+   ```
+
+3. Configurar credenciales de Google Cloud Console
+
+**Nota**: El sistema actual está preparado para esta integración futura.
 
 ## 🎨 Frontend y Plantillas
 
