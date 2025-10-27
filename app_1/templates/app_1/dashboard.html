@@ -11,6 +11,7 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'app_1/css/page_login.css' %}">
+    <link rel="stylesheet" href="{% static 'app_1/css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -51,13 +52,13 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label fw-500">Nombre completo</label>
-                                                <p class="form-control-plaintext">{{ user.get_full_name }}</p>
+                                                <p class="form-control-plaintext user-info-value">{{ user.get_full_name }}</p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label fw-500">Correo electrónico</label>
-                                                <p class="form-control-plaintext">{{ user.email }}</p>
+                                                <p class="form-control-plaintext user-info-value">{{ user.email }}</p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -75,7 +76,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label fw-500">Miembro desde</label>
-                                                <p class="form-control-plaintext">{{ user.date_joined|date:"d/m/Y" }}</p>
+                                                <p class="form-control-plaintext user-info-value">{{ user.date_joined|date:"d/m/Y" }}</p>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -116,4 +117,5 @@
 
 {% block scripts %}
     <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
+    <script src="{% static 'app_1/js/dashboard.js' %}"></script>
 {% endblock %}
