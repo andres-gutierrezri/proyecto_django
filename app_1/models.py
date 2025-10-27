@@ -45,6 +45,19 @@ class CustomUser(AbstractUser):
         null=True
     )
 
+    # Campos para restablecimiento de contraseña
+    password_reset_token = models.CharField(
+        'token de restablecimiento de contraseña',
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    password_reset_sent_at = models.DateTimeField(
+        'fecha de envío de restablecimiento',
+        blank=True,
+        null=True
+    )
+
     # Aceptación de términos y newsletter
     terms_accepted = models.BooleanField('términos aceptados', default=False)
     newsletter_subscription = models.BooleanField(
