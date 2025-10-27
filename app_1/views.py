@@ -9,11 +9,18 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
 from django.core.exceptions import ValidationError
 
-from .forms import CustomUserRegistrationForm, CustomAuthenticationForm
+from .forms import (
+    CustomUserRegistrationForm,
+    CustomAuthenticationForm,
+    PasswordResetRequestForm,
+    PasswordResetConfirmForm
+)
 from .models import CustomUser
 from .utils import (
     send_verification_email,
-    send_login_notification_email
+    send_login_notification_email,
+    send_password_reset_email,
+    send_password_changed_email
 )
 
 
@@ -207,4 +214,143 @@ def dashboard(request):
     }
 
     return render(request, 'app_1/dashboard.html', context)
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
+def password_reset_request(request):
+    """
+    Vista para solicitar restablecimiento de contraseña.
+    El usuario ingresa su email y recibe un enlace para restablecer.
+    """
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+
+            try:
+                user = CustomUser.objects.get(email=email)
+
+                # Enviar email de restablecimiento
+                try:
+                    send_password_reset_email(user, request)
+                    messages.success(
+                        request,
+                        f'Se ha enviado un correo a {email} con instrucciones '
+                        f'para restablecer tu contraseña. Por favor revisa tu '
+                        f'bandeja de entrada.'
+                    )
+                except Exception as e:
+                    messages.error(
+                        request,
+                        'Hubo un problema al enviar el correo. Por favor '
+                        'intenta de nuevo más tarde.'
+                    )
+
+                # Redirigir siempre al login por seguridad
+                # (no revelar si el email existe o no)
+                return redirect('page_login')
+
+            except CustomUser.DoesNotExist:
+                # Por seguridad, mostrar el mismo mensaje incluso si el email no existe
+                messages.success(
+                    request,
+                    f'Si existe una cuenta con el correo {email}, '
+                    f'recibirás un email con instrucciones para restablecer '
+                    f'tu contraseña.'
+                )
+                return redirect('page_login')
+
+    else:
+        form = PasswordResetRequestForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'app_1/password_reset_request.html', context)
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
+def password_reset_confirm(request, token):
+    """
+    Vista para confirmar el restablecimiento de contraseña con el token.
+    El usuario establece su nueva contraseña.
+    """
+    # Buscar el usuario con el token
+    user = get_object_or_404(
+        CustomUser,
+        password_reset_token=token
+    )
+
+    # Verificar que el token no haya expirado (24 horas)
+    from django.utils import timezone
+    from datetime import timedelta
+
+    if user.password_reset_sent_at:
+        expiry_time = user.password_reset_sent_at + timedelta(hours=24)
+        if timezone.now() > expiry_time:
+            messages.error(
+                request,
+                'El enlace de restablecimiento ha expirado. Por favor '
+                'solicita uno nuevo.'
+            )
+            return redirect('password_reset_request')
+
+    if request.method == 'POST':
+        form = PasswordResetConfirmForm(request.POST)
+
+        if form.is_valid():
+            password = form.cleaned_data.get('password1')
+
+            try:
+                # Establecer la nueva contraseña
+                user.set_password(password)
+
+                # Limpiar el token de restablecimiento
+                user.password_reset_token = None
+                user.password_reset_sent_at = None
+                user.save()
+
+                # Enviar email de confirmación
+                try:
+                    send_password_changed_email(user)
+                except Exception:
+                    pass  # No interrumpir si falla el email
+
+                messages.success(
+                    request,
+                    '¡Tu contraseña ha sido actualizada exitosamente! '
+                    'Ya puedes iniciar sesión con tu nueva contraseña.'
+                )
+
+                return redirect('page_login')
+
+            except Exception as e:
+                messages.error(
+                    request,
+                    'Ocurrió un error al actualizar tu contraseña. '
+                    'Por favor intenta de nuevo.'
+                )
+        else:
+            # Mostrar errores del formulario
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+
+    else:
+        form = PasswordResetConfirmForm()
+
+    context = {
+        'form': form,
+        'token': token,
+        'user': user,
+    }
+
+    return render(request, 'app_1/password_reset_confirm.html', context)
 

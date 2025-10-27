@@ -14,6 +14,10 @@ urlpatterns = [
     # Verificación de email
     path('verify-email/<str:token>/', views.verify_email, name='verify_email'),
 
+    # Restablecimiento de contraseña
+    path('password-reset/', views.password_reset_request, name='password_reset_request'),
+    path('password-reset-confirm/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
+
     # Dashboard (protegido)
     path('dashboard/', views.dashboard, name='dashboard'),
 ]
