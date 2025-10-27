@@ -1,0 +1,55 @@
+/**
+ * Dashboard Styles
+ * Estilos personalizados para el dashboard del usuario
+ * Incluye soporte para modo claro y oscuro
+ */
+
+/* Estilos para modo claro (por defecto) */
+.user-info-value {
+    color: #212529 !important;
+    font-weight: 500;
+}
+
+/* Estilos para modo oscuro - usar body en lugar de html */
+body.mod-skin-dark .user-info-value {
+    color: #e9ecef !important;
+}
+
+/* Asegurar que los labels también se vean bien en modo oscuro */
+body.mod-skin-dark .form-label {
+    color: #f8f9fa !important;
+}
+
+/* Mejorar el título del card en modo oscuro */
+body.mod-skin-dark .card h3 {
+    color: #f8f9fa !important;
+}
+
+/* Mejorar el alert en modo oscuro */
+body.mod-skin-dark .alert-info {
+    background-color: #1a4d6d !important;
+    border-color: #2c6a8f !important;
+    color: #e9ecef !important;
+}
+
+/* Estilos adicionales para el dashboard */
+.dashboard-welcome {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.dashboard-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Mejorar la apariencia de los badges en modo oscuro */
+body.mod-skin-dark .badge-secondary {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+body.mod-skin-dark .badge-info {
+    background-color: #17a2b8 !important;
+    color: #ffffff !important;
+}
