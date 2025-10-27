@@ -71,6 +71,9 @@ INSTALLED_APPS = [
     'app_1', # Primera Aplicación del Proyecto
 ]
 
+# Configuración del modelo de usuario personalizado
+AUTH_USER_MODEL = 'app_1.CustomUser'
+
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware', # Seguridad
@@ -127,16 +130,22 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', # Validador de similitud de atributos de usuario
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', # Validador de longitud mínima de contraseña
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', # Validador de contraseña común
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', # Validador de contraseña numérica
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'app_1.validators.PasswordComplexityValidator',
     },
 ]
 
@@ -199,5 +208,23 @@ else:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
     
-# Se define el nombre de la carpeta de archivos públicos para almacenar las imágenes de las caratulas de los libros
+# Se define el nombre de la carpeta de archivos públicos
 PUBLIC_MEDIA = 'publico'
+
+# Configuración de Email
+# https://docs.djangoproject.com/en/5.2/topics/email/
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend'  # Desarrollo
+)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+# Configuración de autenticación
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
