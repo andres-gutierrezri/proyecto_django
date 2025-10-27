@@ -10,8 +10,8 @@ db.sqlite3
 
 # IMPORTANTE: Las migraciones DEBEN estar en Git para producción
 # NO ignorar archivos de migración - son necesarios para Railway/Heroku/Render
-# */migrations/*
-# !*/migrations/__init__.py
+*/migrations/*
+!*/migrations/__init__.py
 
 # Ignore ".log"
 eva.log
