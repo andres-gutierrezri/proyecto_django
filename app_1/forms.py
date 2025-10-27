@@ -200,3 +200,86 @@ class CustomAuthenticationForm(AuthenticationForm):
         if username:
             return username.lower().strip()
         return username
+
+
+class PasswordResetRequestForm(forms.Form):
+    """
+    Formulario para solicitar restablecimiento de contraseña.
+    El usuario ingresa su email y recibe un enlace para restablecer.
+    """
+    email = forms.EmailField(
+        label='Correo electrónico',
+        max_length=254,
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'tu correo electrónico',
+            'id': 'email',
+            'autofocus': True
+        }),
+        help_text='Ingresa el correo electrónico asociado a tu cuenta'
+    )
+
+    def clean_email(self):
+        """Normaliza el email a minúsculas."""
+        email = self.cleaned_data.get('email')
+        if email:
+            return email.lower().strip()
+        return email
+
+
+class PasswordResetConfirmForm(forms.Form):
+    """
+    Formulario para establecer una nueva contraseña después de
+    recibir el enlace de restablecimiento.
+    """
+    password1 = forms.CharField(
+        label='Nueva contraseña',
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'mínimo 8 caracteres',
+            'id': 'password1',
+            'autofocus': True
+        }),
+        help_text=(
+            'Tu contraseña debe tener entre 8 y 20 caracteres, contener '
+            'letras mayúsculas y minúsculas, un carácter especial, y no debe '
+            'contener espacios ni emojis.'
+        )
+    )
+
+    password2 = forms.CharField(
+        label='Confirmar nueva contraseña',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'confirma tu contraseña',
+            'id': 'password2'
+        }),
+        strip=False,
+        help_text='Ingresa la misma contraseña para verificación.'
+    )
+
+    def clean_password1(self):
+        """Valida la longitud máxima de la contraseña."""
+        password = self.cleaned_data.get('password1')
+
+        if len(password) > 20:
+            raise ValidationError(
+                'La contraseña no debe tener más de 20 caracteres.'
+            )
+
+        return password
+
+    def clean(self):
+        """Valida que las dos contraseñas coincidan."""
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(
+                'Las dos contraseñas no coinciden.'
+            )
+
+        return cleaned_data
