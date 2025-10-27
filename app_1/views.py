@@ -146,10 +146,13 @@ def page_login(request):
                             'Contraseña incorrecta.'
                         )
                 except CustomUser.DoesNotExist:
+                    from django.utils.safestring import mark_safe
                     messages.error(
                         request,
-                        'No existe una cuenta con este correo electrónico. '
-                        '¿Deseas registrarte?'
+                        mark_safe(
+                            'No existe una cuenta con este correo electrónico. '
+                            '<a href="/register/" class="alert-link">¿Deseas registrarte?</a>'
+                        )
                     )
     else:
         form = CustomAuthenticationForm()
