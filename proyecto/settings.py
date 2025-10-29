@@ -86,6 +86,33 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise para archivos estáticos
 ]
 
+# Session Configuration
+# Configuración de sesiones
+# https://docs.djangoproject.com/en/5.2/topics/http/sessions/
+
+# Tiempo de inactividad antes de expirar la sesión (30 minutos = 1800 segundos)
+SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
+
+# La sesión expira cuando el usuario cierra el navegador (si no marca "Recordarme")
+# Esta configuración se sobrescribe en las vistas de login cuando el usuario marca "Recordarme"
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Actualizar el tiempo de expiración de la sesión en cada request
+# Esto significa que si el usuario está activo, la sesión se renueva automáticamente
+SESSION_SAVE_EVERY_REQUEST = True
+
+# Nombre de la cookie de sesión
+SESSION_COOKIE_NAME = 'sessionid'
+
+# Solo enviar cookie por HTTPS en producción
+SESSION_COOKIE_SECURE = IS_DEPLOYED
+
+# Protección contra acceso JavaScript a la cookie de sesión
+SESSION_COOKIE_HTTPONLY = True
+
+# Restricción de cookie a same-site
+SESSION_COOKIE_SAMESITE = 'Lax'
+
 
 # URL Configuration
 # Configuración de URL
