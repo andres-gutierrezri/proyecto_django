@@ -61,13 +61,15 @@ cmds = [
 # 1. collectstatic: Recolecta archivos estáticos a STATIC_ROOT
 # 2. makemigrations: Genera archivos de migración para cambios en modelos
 # 3. migrate: Aplica migraciones pendientes a la base de datos
-# 4. gunicorn: Inicia el servidor WSGI de producción
+# 4. create_default_superuser.py: Crea superusuario automáticamente si no existe
+# 5. gunicorn: Inicia el servidor WSGI de producción
 #
 # NOTA: makemigrations se ejecuta automáticamente para generar migraciones
 #       que no están en el repositorio (ignoreadas en .gitignore)
+# NOTA: El superusuario se crea usando variables de entorno configuradas en Railway
 # ----------------------------------------------------------------------------
 [start]
-cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py makemigrations && /opt/venv/bin/python manage.py migrate && /opt/venv/bin/gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:8080 --log-file -"
+cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py makemigrations && /opt/venv/bin/python manage.py migrate && /opt/venv/bin/python create_default_superuser.py && /opt/venv/bin/gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:8080 --log-file -"
 
 # Desglose del comando de inicio:
 #
@@ -87,6 +89,12 @@ cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/p
 #   - Se conecta a PostgreSQL o MySQL según DATABASE_SELECTOR
 #   - Ejecuta las migraciones generadas por makemigrations
 #
+# /opt/venv/bin/python create_default_superuser.py
+#   - Script Python independiente que crea el superusuario automáticamente
+#   - Usa variables de entorno: DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_PASSWORD
+#   - No falla si el superusuario ya existe (seguro para re-despliegues)
+#   - Configura Django automáticamente (django.setup())
+#
 # /opt/venv/bin/gunicorn proyecto.wsgi:application
 #   - Inicia el servidor WSGI Gunicorn para servir la aplicación
 #   - --workers 3: Usa 3 procesos worker para manejar requests
@@ -98,12 +106,20 @@ cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/p
 # ============================================================================
 # Estas variables deben configurarse en el dashboard de Railway:
 #
+# Configuración Django:
 # IS_DEPLOYED=True                      # Activa modo producción (DEBUG=False)
 # SECRET_KEY=<clave-secreta-generada>   # Clave secreta de Django (nunca commitear)
 # DATABASE_SELECTOR=postgresql          # o "mysql" según tu base de datos
 # POSTGRESQL_DATABASE_URL=postgres://user:pass@host:port/dbname
 # # O para MySQL:
 # # MYSQL_DATABASE_URL=mysql://user:pass@host:port/dbname
+#
+# Superusuario (creación automática):
+# DJANGO_SUPERUSER_EMAIL=admin@proyecto.com
+# DJANGO_SUPERUSER_USERNAME=admin
+# DJANGO_SUPERUSER_PASSWORD=<contraseña-segura>
+# DJANGO_SUPERUSER_FIRST_NAME=Administrador  # Opcional
+# DJANGO_SUPERUSER_LAST_NAME=Sistema         # Opcional
 #
 # Opcionales (para AWS S3):
 # AWS_ACCESS_KEY_ID=<access-key>

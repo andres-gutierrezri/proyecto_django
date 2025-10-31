@@ -246,6 +246,12 @@ fi
 
 echo "✅ Migraciones completadas"
 
+echo "👤 Creando superusuario por defecto (si no existe)..."
+.venv/bin/python create_default_superuser.py
+if [ $? -ne 0 ]; then
+    echo "⚠️  Advertencia al crear superusuario (puede ser normal si ya existe)"
+fi
+
 echo "🔍 Verificando importación de MySQLdb..."
 .venv/bin/python -c "import MySQLdb; print('MySQLdb import successful')" 2>/dev/null
 if [ $? -eq 0 ]; then

@@ -229,6 +229,12 @@ if %errorlevel% neq 0 (
 
 echo ✅ Migraciones completadas
 
+echo 👤 Creando superusuario por defecto ^(si no existe^)...
+.venv\Scripts\python.exe create_default_superuser.py
+if %errorlevel% neq 0 (
+    echo ⚠️  Advertencia al crear superusuario ^(puede ser normal si ya existe^)
+)
+
 echo 🔍 Verificando importación de MySQLdb...
 .venv\Scripts\python.exe -c "import MySQLdb; print('MySQLdb import successful')" 2>nul
 if %errorlevel% equ 0 (

@@ -449,14 +449,30 @@ def verify_mysqldb_import(python_executable):
         
         return False
 
+def create_default_superuser(python_executable):
+    """Crea el superusuario por defecto si no existe"""
+    print("👤 Creando superusuario por defecto (si no existe)...")
+    try:
+        result = subprocess.run([
+            str(python_executable),
+            "create_default_superuser.py"
+        ], cwd=Path(__file__).parent, check=True, capture_output=True, text=True)
+        if result.stdout:
+            print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Advertencia al crear superusuario (puede ser normal si ya existe)")
+        if e.stderr:
+            print(f"Advertencia: {e.stderr}")
+        # No hacer sys.exit(1) aquí porque puede fallar si ya existe
+
 def run_migrations(python_executable):
     """Ejecuta las migraciones de Django"""
     # Primero recolectar archivos estáticos
     print("📁 Recolectando archivos estáticos...")
     try:
         result = subprocess.run([
-            str(python_executable), 
-            "manage.py", 
+            str(python_executable),
+            "manage.py",
             "collectstatic",
             "--noinput"
         ], cwd=Path(__file__).parent, check=True, capture_output=True, text=True)
@@ -468,13 +484,13 @@ def run_migrations(python_executable):
         if e.stderr:
             print(f"Advertencia: {e.stderr}")
         # No hacer sys.exit(1) aquí porque collectstatic puede fallar si no está configurado
-    
+
     # Después ejecutar makemigrations
     print("🔄 Ejecutando makemigrations...")
     try:
         result = subprocess.run([
-            str(python_executable), 
-            "manage.py", 
+            str(python_executable),
+            "manage.py",
             "makemigrations"
         ], cwd=Path(__file__).parent, check=True, capture_output=True, text=True)
         print("✅ Makemigrations completado exitosamente")
@@ -485,13 +501,13 @@ def run_migrations(python_executable):
         if e.stderr:
             print(f"Advertencia: {e.stderr}")
         # No hacer sys.exit(1) aquí porque makemigrations puede fallar si no hay cambios
-    
+
     # Después ejecutar migrate
     print("🔄 Ejecutando migraciones...")
     try:
         result = subprocess.run([
-            str(python_executable), 
-            "manage.py", 
+            str(python_executable),
+            "manage.py",
             "migrate"
         ], cwd=Path(__file__).parent, check=True, capture_output=True, text=True)
         print("✅ Migraciones completadas exitosamente")
@@ -502,6 +518,9 @@ def run_migrations(python_executable):
         if e.stderr:
             print(f"Error: {e.stderr}")
         sys.exit(1)
+
+    # Finalmente crear superusuario
+    create_default_superuser(python_executable)
 
 def open_browser_delayed():
     """Abre el navegador después de un pequeño delay para que el servidor esté listo"""
