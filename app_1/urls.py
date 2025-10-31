@@ -20,4 +20,7 @@ urlpatterns = [
 
     # Dashboard (protegido)
     path('dashboard/', views.dashboard, name='dashboard'),
+
+    # Gestión de sesiones
+    path('terminate-session/<str:session_key>/', views.terminate_session, name='terminate_session'),
 ]
