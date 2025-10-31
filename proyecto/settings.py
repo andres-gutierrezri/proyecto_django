@@ -240,10 +240,39 @@ PUBLIC_MEDIA = 'publico'
 
 # Configuración de Email
 # https://docs.djangoproject.com/en/5.2/topics/email/
-EMAIL_BACKEND = os.getenv(
-    'EMAIL_BACKEND',
-    'django.core.mail.backends.console.EmailBackend'  # Desarrollo
-)
+
+# Configuración de Email para Gmail
+# Para Gmail, genera una "Contraseña de aplicación" en https://myaccount.google.com/apppasswords
+# NO uses tu contraseña normal de Gmail
+# Activa la verificación en dos pasos primero
+
+# Backend de email (desarrollo vs producción)
+# Desarrollo (emails en consola):
+# EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+# Producción (emails reales vía SMTP):
+# EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+
+# EMAIL_HOST = smtp.gmail.com # Host de Gmail
+# EMAIL_PORT = 587 # Puerto de Gmail
+# EMAIL_USE_TLS = True # Usar TLS
+# EMAIL_HOST_USER = tu-email@gmail.com # Tu email de Gmail
+# EMAIL_HOST_PASSWORD = tu-contraseña-de-aplicación-de-google # Contraseña de aplicación de Gmail
+# DEFAULT_FROM_EMAIL = tu-email@gmail.com # Email de remitente
+
+# Si IS_DEPLOYED es True, se usa el backend de SMTP - Gmail
+# Si IS_DEPLOYED es False, se usa el backend de Consola
+
+if IS_DEPLOYED:
+    EMAIL_BACKEND = os.getenv(
+        'EMAIL_BACKEND',
+        'django.core.mail.backends.smtp.EmailBackend'  # Producción (SMTP - Gmail)
+    )
+else:
+    EMAIL_BACKEND = os.getenv(
+        'EMAIL_BACKEND',    
+        'django.core.mail.backends.console.EmailBackend' # Desarrollo (Consola)
+    )
+
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
