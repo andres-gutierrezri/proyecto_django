@@ -3,6 +3,7 @@ Formularios para autenticación y registro de usuarios.
 """
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import CustomUser
 
@@ -121,13 +122,12 @@ class CustomUserRegistrationForm(UserCreationForm):
         return email
 
     def clean_password1(self):
-        """Valida la longitud máxima de la contraseña."""
+        """Valida la contraseña usando todos los validadores configurados."""
         password = self.cleaned_data.get('password1')
 
-        if len(password) > 20:
-            raise ValidationError(
-                'La contraseña no debe tener más de 20 caracteres.'
-            )
+        # Ejecutar todos los validadores de Django (incluido el personalizado)
+        if password:
+            validate_password(password, self.instance)
 
         return password
 
@@ -261,13 +261,12 @@ class PasswordResetConfirmForm(forms.Form):
     )
 
     def clean_password1(self):
-        """Valida la longitud máxima de la contraseña."""
+        """Valida la contraseña usando todos los validadores configurados."""
         password = self.cleaned_data.get('password1')
 
-        if len(password) > 20:
-            raise ValidationError(
-                'La contraseña no debe tener más de 20 caracteres.'
-            )
+        # Ejecutar todos los validadores de Django (incluido el personalizado)
+        if password:
+            validate_password(password)
 
         return password
 
