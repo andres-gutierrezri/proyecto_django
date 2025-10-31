@@ -59,13 +59,15 @@ cmds = [
 # ----------------------------------------------------------------------------
 # Ejecuta los comandos necesarios para preparar y lanzar la aplicación Django:
 # 1. collectstatic: Recolecta archivos estáticos a STATIC_ROOT
-# 2. migrate: Aplica migraciones pendientes a la base de datos
-# 3. gunicorn: Inicia el servidor WSGI de producción
+# 2. makemigrations: Genera archivos de migración para cambios en modelos
+# 3. migrate: Aplica migraciones pendientes a la base de datos
+# 4. gunicorn: Inicia el servidor WSGI de producción
 #
-# IMPORTANTE: makemigrations NO se ejecuta en producción (se hace en desarrollo)
+# NOTA: makemigrations se ejecuta automáticamente para generar migraciones
+#       que no están en el repositorio (ignoreadas en .gitignore)
 # ----------------------------------------------------------------------------
 [start]
-cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py migrate && /opt/venv/bin/gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:8080 --log-file -"
+cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py makemigrations && /opt/venv/bin/python manage.py migrate && /opt/venv/bin/gunicorn proyecto.wsgi:application --workers 3 --bind 0.0.0.0:8080 --log-file -"
 
 # Desglose del comando de inicio:
 #
@@ -74,10 +76,16 @@ cmd = "/opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/p
 #   - --noinput: No solicita confirmación (modo automático)
 #   - WhiteNoise los sirve comprimidos con caché optimizado
 #
+# /opt/venv/bin/python manage.py makemigrations
+#   - Genera archivos de migración para cambios en modelos
+#   - Detecta automáticamente cambios en models.py
+#   - Las migraciones NO están en Git (ignoreadas en .gitignore)
+#   - Se generan automáticamente en cada despliegue
+#
 # /opt/venv/bin/python manage.py migrate
 #   - Aplica migraciones de base de datos pendientes
 #   - Se conecta a PostgreSQL o MySQL según DATABASE_SELECTOR
-#   - NOTA: Las migraciones deben estar comiteadas en el repositorio
+#   - Ejecuta las migraciones generadas por makemigrations
 #
 # /opt/venv/bin/gunicorn proyecto.wsgi:application
 #   - Inicia el servidor WSGI Gunicorn para servir la aplicación

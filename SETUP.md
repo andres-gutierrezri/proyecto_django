@@ -71,12 +71,12 @@ EMAIL_HOST_PASSWORD=tu-contraseña-de-aplicación
 DEFAULT_FROM_EMAIL=tu-email@gmail.com
 ```
 
-### 5. Generar Migraciones
+### 5. Generar y Aplicar Migraciones
 
-**IMPORTANTE:** Las migraciones NO están incluidas en el repositorio y deben generarse localmente.
+**IMPORTANTE:** Las migraciones NO están incluidas en el repositorio y se generan automáticamente.
 
 ```bash
-# Generar archivos de migración
+# Generar archivos de migración para cambios en modelos
 python manage.py makemigrations
 
 # Aplicar migraciones a la base de datos
@@ -86,6 +86,9 @@ python manage.py migrate
 Esto creará automáticamente:
 - `app_1/migrations/0002_usersession.py` - Tabla de sesiones de usuarios
 - Todas las tablas necesarias en la base de datos
+
+**Nota para Producción (Railway):**
+En producción, el archivo `nixpacks.toml` está configurado para ejecutar automáticamente `makemigrations` y `migrate` durante cada despliegue, por lo que no es necesario incluir las migraciones en Git.
 
 ### 6. Crear Superusuario
 
