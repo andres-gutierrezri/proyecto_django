@@ -48,7 +48,22 @@ def send_verification_email(user, request):
         'app_1/emails/verification_email.html',
         context
     )
-    plain_message = strip_tags(html_message)
+
+    # Crear mensaje de texto plano limpio y legible
+    plain_message = f"""
+Hola {user.get_full_name() or user.username},
+
+Gracias por registrarte en Aplicación Web.
+
+Para completar tu registro, por favor verifica tu correo electrónico haciendo clic en el siguiente enlace:
+
+{verification_url}
+
+Si no creaste una cuenta en Aplicación Web, puedes ignorar este correo.
+
+Saludos,
+El equipo de Aplicación Web
+    """.strip()
 
     # Enviar el email
     send_mail(
@@ -76,11 +91,12 @@ def send_login_notification_email(user, request):
     # Obtener información del request
     ip_address = get_client_ip(request)
     user_agent = request.META.get('HTTP_USER_AGENT', 'Desconocido')
+    login_time = timezone.now()
 
     # Contexto para el template
     context = {
         'user': user,
-        'login_time': timezone.now(),
+        'login_time': login_time,
         'ip_address': ip_address,
         'user_agent': user_agent,
         'site_name': 'Aplicación Web',
@@ -91,7 +107,23 @@ def send_login_notification_email(user, request):
         'app_1/emails/login_notification.html',
         context
     )
-    plain_message = strip_tags(html_message)
+
+    # Crear mensaje de texto plano limpio y legible
+    plain_message = f"""
+Hola {user.get_full_name() or user.username},
+
+Se ha detectado un nuevo inicio de sesión en tu cuenta.
+
+Detalles del inicio de sesión:
+- Fecha y hora: {login_time.strftime('%d/%m/%Y %H:%M')}
+- Dirección IP: {ip_address}
+- Dispositivo: {user_agent}
+
+Si no reconoces esta actividad, te recomendamos cambiar tu contraseña inmediatamente.
+
+Saludos,
+El equipo de Aplicación Web
+    """.strip()
 
     # Enviar el email
     send_mail(
@@ -161,7 +193,24 @@ def send_password_reset_email(user, request):
         'app_1/emails/password_reset_email.html',
         context
     )
-    plain_message = strip_tags(html_message)
+
+    # Crear mensaje de texto plano limpio y legible
+    plain_message = f"""
+Hola {user.get_full_name() or user.username},
+
+Recibimos una solicitud para restablecer la contraseña de tu cuenta en Aplicación Web.
+
+Para restablecer tu contraseña, haz clic en el siguiente enlace:
+
+{reset_url}
+
+Este enlace es válido por 24 horas.
+
+Si no solicitaste restablecer tu contraseña, puedes ignorar este correo. Tu contraseña actual seguirá siendo válida.
+
+Saludos,
+El equipo de Aplicación Web
+    """.strip()
 
     # Enviar el email
     send_mail(
@@ -184,11 +233,12 @@ def send_password_changed_email(user, request):
     """
     # Construir URL completa del sitio
     site_url = request.build_absolute_uri('/').rstrip('/')
+    change_time = timezone.now()
 
     # Contexto para el template
     context = {
         'user': user,
-        'change_time': timezone.now(),
+        'change_time': change_time,
         'site_name': 'Aplicación Web',
         'site_url': site_url,
     }
@@ -198,7 +248,21 @@ def send_password_changed_email(user, request):
         'app_1/emails/password_changed_email.html',
         context
     )
-    plain_message = strip_tags(html_message)
+
+    # Crear mensaje de texto plano limpio y legible
+    plain_message = f"""
+Hola {user.get_full_name() or user.username},
+
+Tu contraseña ha sido actualizada exitosamente.
+
+Detalles del cambio:
+- Fecha y hora: {change_time.strftime('%d/%m/%Y %H:%M')}
+
+Si no realizaste este cambio, contacta inmediatamente con nosotros en {site_url}
+
+Saludos,
+El equipo de Aplicación Web
+    """.strip()
 
     # Enviar el email
     send_mail(
