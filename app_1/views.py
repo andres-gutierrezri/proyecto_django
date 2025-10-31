@@ -309,6 +309,21 @@ def password_reset_confirm(request, token):
             password = form.cleaned_data.get('password1')
 
             try:
+                # Verificar que la nueva contraseña sea diferente a la anterior
+                if user.check_password(password):
+                    messages.error(
+                        request,
+                        'La nueva contraseña no puede ser igual a la anterior. '
+                        'Por favor elige una contraseña diferente.'
+                    )
+                    # No limpiar el formulario, mantener el token válido
+                    context = {
+                        'form': form,
+                        'token': token,
+                        'user': user,
+                    }
+                    return render(request, 'app_1/password_reset_confirm.html', context)
+
                 # Establecer la nueva contraseña
                 user.set_password(password)
 
