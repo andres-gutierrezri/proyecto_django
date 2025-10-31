@@ -4,7 +4,6 @@ Utilidades para la aplicación, incluyendo envío de emails.
 import secrets
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.conf import settings
 from django.utils import timezone
 
@@ -36,19 +35,6 @@ def send_verification_email(user, request):
         f'/verify-email/{token}/'
     )
 
-    # Contexto para el template
-    context = {
-        'user': user,
-        'verification_url': verification_url,
-        'site_name': 'Aplicación Web',
-    }
-
-    # Renderizar el email HTML
-    html_message = render_to_string(
-        'app_1/emails/verification_email.html',
-        context
-    )
-
     # Crear mensaje de texto plano limpio y legible
     plain_message = f"""
 Hola {user.get_full_name() or user.username},
@@ -64,6 +50,19 @@ Si no creaste una cuenta en Aplicación Web, puedes ignorar este correo.
 Saludos,
 El equipo de Aplicación Web
     """.strip()
+
+    # Renderizar HTML solo en producción
+    html_message = None
+    if settings.IS_DEPLOYED:
+        context = {
+            'user': user,
+            'verification_url': verification_url,
+            'site_name': 'Aplicación Web',
+        }
+        html_message = render_to_string(
+            'app_1/emails/verification_email.html',
+            context
+        )
 
     # Enviar el email
     send_mail(
@@ -93,21 +92,6 @@ def send_login_notification_email(user, request):
     user_agent = request.META.get('HTTP_USER_AGENT', 'Desconocido')
     login_time = timezone.now()
 
-    # Contexto para el template
-    context = {
-        'user': user,
-        'login_time': login_time,
-        'ip_address': ip_address,
-        'user_agent': user_agent,
-        'site_name': 'Aplicación Web',
-    }
-
-    # Renderizar el email HTML
-    html_message = render_to_string(
-        'app_1/emails/login_notification.html',
-        context
-    )
-
     # Crear mensaje de texto plano limpio y legible
     plain_message = f"""
 Hola {user.get_full_name() or user.username},
@@ -124,6 +108,21 @@ Si no reconoces esta actividad, te recomendamos cambiar tu contraseña inmediata
 Saludos,
 El equipo de Aplicación Web
     """.strip()
+
+    # Renderizar HTML solo en producción
+    html_message = None
+    if settings.IS_DEPLOYED:
+        context = {
+            'user': user,
+            'login_time': login_time,
+            'ip_address': ip_address,
+            'user_agent': user_agent,
+            'site_name': 'Aplicación Web',
+        }
+        html_message = render_to_string(
+            'app_1/emails/login_notification.html',
+            context
+        )
 
     # Enviar el email
     send_mail(
@@ -180,20 +179,6 @@ def send_password_reset_email(user, request):
         f'/password-reset-confirm/{token}/'
     )
 
-    # Contexto para el template
-    context = {
-        'user': user,
-        'reset_url': reset_url,
-        'site_name': 'Aplicación Web',
-        'valid_hours': 24,  # El enlace será válido por 24 horas
-    }
-
-    # Renderizar el email HTML
-    html_message = render_to_string(
-        'app_1/emails/password_reset_email.html',
-        context
-    )
-
     # Crear mensaje de texto plano limpio y legible
     plain_message = f"""
 Hola {user.get_full_name() or user.username},
@@ -211,6 +196,20 @@ Si no solicitaste restablecer tu contraseña, puedes ignorar este correo. Tu con
 Saludos,
 El equipo de Aplicación Web
     """.strip()
+
+    # Renderizar HTML solo en producción
+    html_message = None
+    if settings.IS_DEPLOYED:
+        context = {
+            'user': user,
+            'reset_url': reset_url,
+            'site_name': 'Aplicación Web',
+            'valid_hours': 24,  # El enlace será válido por 24 horas
+        }
+        html_message = render_to_string(
+            'app_1/emails/password_reset_email.html',
+            context
+        )
 
     # Enviar el email
     send_mail(
@@ -235,20 +234,6 @@ def send_password_changed_email(user, request):
     site_url = request.build_absolute_uri('/').rstrip('/')
     change_time = timezone.now()
 
-    # Contexto para el template
-    context = {
-        'user': user,
-        'change_time': change_time,
-        'site_name': 'Aplicación Web',
-        'site_url': site_url,
-    }
-
-    # Renderizar el email HTML
-    html_message = render_to_string(
-        'app_1/emails/password_changed_email.html',
-        context
-    )
-
     # Crear mensaje de texto plano limpio y legible
     plain_message = f"""
 Hola {user.get_full_name() or user.username},
@@ -263,6 +248,20 @@ Si no realizaste este cambio, contacta inmediatamente con nosotros en {site_url}
 Saludos,
 El equipo de Aplicación Web
     """.strip()
+
+    # Renderizar HTML solo en producción
+    html_message = None
+    if settings.IS_DEPLOYED:
+        context = {
+            'user': user,
+            'change_time': change_time,
+            'site_name': 'Aplicación Web',
+            'site_url': site_url,
+        }
+        html_message = render_to_string(
+            'app_1/emails/password_changed_email.html',
+            context
+        )
 
     # Enviar el email
     send_mail(
