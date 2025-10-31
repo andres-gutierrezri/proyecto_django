@@ -15,7 +15,7 @@ from .forms import (
     PasswordResetRequestForm,
     PasswordResetConfirmForm
 )
-from .models import CustomUser
+from .models import CustomUser, UserSession
 from .utils import (
     send_verification_email,
     send_login_notification_email,
@@ -116,6 +116,18 @@ def page_login(request):
                     # Sesión expira al cerrar el navegador
                     request.session.set_expiry(0)
 
+                # Registrar sesión del usuario
+                try:
+                    from .utils import get_client_ip
+                    UserSession.objects.create(
+                        user=user,
+                        session_key=request.session.session_key,
+                        ip_address=get_client_ip(request),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
+                except Exception:
+                    pass  # No interrumpir el login si falla el registro de sesión
+
                 # Enviar notificación de login
                 try:
                     send_login_notification_email(user, request)
@@ -173,10 +185,70 @@ def page_login(request):
 
 @require_http_methods(["GET", "POST"])
 def user_logout(request):
-    """Vista para cerrar sesión."""
+    """Vista para cerrar sesión y eliminar registro de sesión."""
+    # Eliminar la sesión del registro antes de hacer logout
+    if request.user.is_authenticated:
+        try:
+            session_key = request.session.session_key
+            UserSession.objects.filter(
+                user=request.user,
+                session_key=session_key
+            ).delete()
+        except Exception:
+            pass  # No interrumpir el logout si falla
+
     logout(request)
     messages.success(request, 'Has cerrado sesión exitosamente.')
     return redirect('page_login')
+
+
+@login_required
+@require_http_methods(["POST"])
+def terminate_session(request, session_key):
+    """
+    Vista para cerrar una sesión específica.
+    Solo el propietario de la sesión puede cerrarla.
+    """
+    try:
+        # Verificar que la sesión pertenece al usuario actual
+        user_session = get_object_or_404(
+            UserSession,
+            user=request.user,
+            session_key=session_key
+        )
+
+        # Verificar que no sea la sesión actual
+        if session_key == request.session.session_key:
+            messages.error(
+                request,
+                'No puedes cerrar tu sesión actual desde aquí. '
+                'Usa el botón de cerrar sesión.'
+            )
+            return redirect('dashboard')
+
+        # Eliminar la sesión de Django
+        from django.contrib.sessions.models import Session
+        try:
+            Session.objects.get(session_key=session_key).delete()
+        except Session.DoesNotExist:
+            pass
+
+        # Eliminar el registro de la sesión
+        user_session.delete()
+
+        messages.success(
+            request,
+            f'La sesión desde {user_session.get_device_info()} ha sido cerrada.'
+        )
+
+    except Exception as e:
+        messages.error(
+            request,
+            'Hubo un problema al cerrar la sesión. '
+            'Es posible que ya haya expirado.'
+        )
+
+    return redirect('dashboard')
 
 
 @require_http_methods(["GET"])
@@ -208,9 +280,26 @@ def dashboard(request):
     """
     Vista protegida del dashboard.
     Solo accesible para usuarios autenticados.
+    Muestra información de sesiones activas.
     """
+    # Limpiar sesiones inválidas
+    UserSession.cleanup_invalid_sessions(request.user)
+
+    # Obtener sesiones activas
+    active_sessions = UserSession.objects.filter(user=request.user)
+
+    # Detectar sesión actual
+    current_session_key = request.session.session_key
+
+    # Determinar si hay múltiples sesiones
+    multiple_sessions = active_sessions.count() > 1
+
     context = {
         'user': request.user,
+        'active_sessions': active_sessions,
+        'current_session_key': current_session_key,
+        'multiple_sessions': multiple_sessions,
+        'sessions_count': active_sessions.count(),
     }
 
     return render(request, 'app_1/dashboard.html', context)
