@@ -465,13 +465,28 @@ El proyecto usa un modelo de usuario personalizado ([app_1/models.py](app_1/mode
 
 ### Configuración de Email
 
-Por defecto, los emails se muestran en la consola del servidor (modo desarrollo). Para enviar emails reales en producción:
+El sistema de emails utiliza la variable `IS_DEPLOYED` para controlar el comportamiento:
 
-**Agregar al archivo `.env`:**
+**Desarrollo (`IS_DEPLOYED=False`):**
+- Los emails se muestran en la consola del servidor
+- Solo se envía texto plano (sin HTML)
+- No requiere configuración SMTP
+
+**Producción (`IS_DEPLOYED=True`):**
+- Los emails se envían vía SMTP
+- Se renderiza tanto texto plano como HTML
+- Requiere configuración completa
+
+**Configuración en `.env`:**
 
 ```bash
-# Configuración de Email para Gmail
+# Desarrollo (emails en consola)
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+IS_DEPLOYED=False
+
+# Producción (emails reales vía Gmail)
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+IS_DEPLOYED=True
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
@@ -484,6 +499,7 @@ DEFAULT_FROM_EMAIL=tu-email@gmail.com
 - Para Gmail, genera una "Contraseña de aplicación" en https://myaccount.google.com/apppasswords
 - NO uses tu contraseña normal de Gmail
 - Activa la verificación en dos pasos primero
+- La variable `IS_DEPLOYED` controla automáticamente el renderizado HTML de emails
 
 ### Uso del Sistema de Autenticación
 

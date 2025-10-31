@@ -141,17 +141,28 @@ python manage.py runserver 127.0.0.1:8000
 - Contraseñas seguras con validación estricta
 - Restablecimiento de contraseña por email
 - Notificaciones de inicio de sesión
+- Emails condicionales según entorno (IS_DEPLOYED)
+- Creación automática de superusuario en despliegue
 
 ### Gestión de Sesiones
-- Rastreo de sesiones activas por usuario
+- Rastreo de sesiones activas por usuario (modelo UserSession)
 - Detección de múltiples dispositivos
-- Cierre remoto de sesiones
+- Cierre remoto de sesiones desde el dashboard
 - Timeout automático después de 30 minutos de inactividad
+- Limpieza automática de sesiones inválidas
+
+### Sistema de Emails
+- **Desarrollo (`IS_DEPLOYED=False`)**: Emails en consola (solo texto plano)
+- **Producción (`IS_DEPLOYED=True`)**: Emails SMTP (texto plano + HTML)
+- Control automático mediante variable IS_DEPLOYED
+- Templates responsive con Bootstrap
 
 ### Dashboard
 - Información de cuenta del usuario
-- Visualización de sesiones activas
+- Visualización de sesiones activas con detalles
 - Alertas de seguridad para múltiples sesiones
+- Gestión de sesiones remotas (cerrar sesiones individuales)
+- Información de dispositivos y última actividad
 - Tema claro/oscuro
 
 ## Solución de Problemas
