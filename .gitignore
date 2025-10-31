@@ -8,11 +8,9 @@ db.sqlite3
 # If you are using PostgreSQL
 *.psql
 
-# IMPORTANTE: Las migraciones DEBEN estar en Git para producción
-# Las migraciones son necesarias para Railway/Heroku/Render y deben estar en el repositorio
-# Solo ignoramos archivos temporales y __pycache__ dentro de migrations/
-*/migrations/__pycache__/
-*/migrations/*.pyc
+# Ignorar migraciones de Django (se generan automáticamente al ejecutar makemigrations)
+*/migrations/*
+!*/migrations/__init__.py
 
 # Ignore ".log"
 eva.log
