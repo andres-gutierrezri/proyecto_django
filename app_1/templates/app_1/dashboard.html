@@ -103,6 +103,73 @@
                                         </a>
                                     </div>
                                 </div>
+
+                                <!-- Sección de sesiones activas -->
+                                {% if multiple_sessions %}
+                                <div class="card p-4 rounded-plus bg-faded mt-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h3 class="mb-0">
+                                            <i class="fal fa-shield-check text-warning"></i>
+                                            Sesiones Activas
+                                        </h3>
+                                        <span class="badge badge-warning badge-pill fs-lg">
+                                            {{ sessions_count }} sesión{{ sessions_count|pluralize:"es" }}
+                                        </span>
+                                    </div>
+
+                                    <div class="alert alert-warning" role="alert">
+                                        <strong><i class="fal fa-exclamation-triangle"></i> Aviso de Seguridad:</strong>
+                                        Has iniciado sesión en múltiples dispositivos. Si no reconoces alguna de estas sesiones, ciérrala inmediatamente y cambia tu contraseña.
+                                    </div>
+
+                                    <div class="list-group">
+                                        {% for session in active_sessions %}
+                                        <div class="list-group-item {% if session.session_key == current_session_key %}border-success{% endif %}">
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <div class="flex-grow-1">
+                                                    <h5 class="mb-1">
+                                                        <i class="fal fa-desktop text-primary"></i>
+                                                        {{ session.get_device_info }}
+                                                        {% if session.session_key == current_session_key %}
+                                                            <span class="badge badge-success ml-2">Sesión actual</span>
+                                                        {% endif %}
+                                                    </h5>
+                                                    <p class="mb-1 small">
+                                                        <i class="fal fa-map-marker-alt"></i>
+                                                        <strong>IP:</strong> {{ session.ip_address }}
+                                                    </p>
+                                                    <p class="mb-1 small">
+                                                        <i class="fal fa-clock"></i>
+                                                        <strong>Iniciada:</strong> {{ session.created_at|date:"d/m/Y H:i" }}
+                                                    </p>
+                                                    <p class="mb-0 small">
+                                                        <i class="fal fa-history"></i>
+                                                        <strong>Última actividad:</strong> {{ session.last_activity|date:"d/m/Y H:i" }}
+                                                    </p>
+                                                </div>
+                                                {% if session.session_key != current_session_key %}
+                                                <div class="ml-3">
+                                                    <form method="post" action="{% url 'terminate_session' session.session_key %}" style="display: inline;">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que deseas cerrar esta sesión?')">
+                                                            <i class="fal fa-times-circle"></i> Cerrar sesión
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="alert alert-info mt-3 mb-0" role="alert">
+                                        <small>
+                                            <i class="fal fa-info-circle"></i>
+                                            <strong>Consejo de seguridad:</strong> Revisa regularmente tus sesiones activas. Si ves actividad sospechosa, cierra todas las sesiones excepto la actual y cambia tu contraseña inmediatamente.
+                                        </small>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-white">
