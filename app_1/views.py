@@ -319,7 +319,7 @@ def password_reset_confirm(request, token):
 
                 # Enviar email de confirmación
                 try:
-                    send_password_changed_email(user)
+                    send_password_changed_email(user, request)
                 except Exception:
                     pass  # No interrumpir si falla el email
 

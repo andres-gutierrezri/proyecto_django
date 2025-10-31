@@ -174,18 +174,23 @@ def send_password_reset_email(user, request):
     )
 
 
-def send_password_changed_email(user):
+def send_password_changed_email(user, request):
     """
     Envía un email de confirmación cuando la contraseña ha sido cambiada.
 
     Args:
         user: Instancia del modelo CustomUser
+        request: Objeto HttpRequest para construir URLs absolutas
     """
+    # Construir URL completa del sitio
+    site_url = request.build_absolute_uri('/').rstrip('/')
+
     # Contexto para el template
     context = {
         'user': user,
         'change_time': timezone.now(),
         'site_name': 'Aplicación Web',
+        'site_url': site_url,
     }
 
     # Renderizar el email HTML
