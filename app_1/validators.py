@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 class PasswordComplexityValidator:
     """
     Valida que la contraseña cumpla con los requisitos de complejidad:
+    - Entre 8 y 20 caracteres
     - Al menos una letra mayúscula
     - Al menos una letra minúscula
     - Al menos un carácter especial (!@#$%^&*()_+-=[]{}|;:,.<>?)
@@ -18,7 +19,19 @@ class PasswordComplexityValidator:
 
     def validate(self, password, user=None):
         """Valida la contraseña según los criterios de complejidad."""
+        # El parámetro 'user' es requerido por la interfaz de Django
+        # pero no se utiliza en esta validación
         errors = []
+
+        # Verificar longitud (entre 8 y 20 caracteres)
+        if len(password) < 8:
+            errors.append(
+                'La contraseña debe tener al menos 8 caracteres.'
+            )
+        elif len(password) > 20:
+            errors.append(
+                'La contraseña no debe exceder los 20 caracteres.'
+            )
 
         # Verificar mayúscula
         if not re.search(r'[A-Z]', password):
@@ -53,7 +66,7 @@ class PasswordComplexityValidator:
     def get_help_text(self):
         """Retorna el texto de ayuda para el validador."""
         return _(
-            'Tu contraseña debe contener al menos una letra mayúscula, '
-            'una minúscula, un carácter especial y no debe contener espacios '
-            'ni emojis.'
+            'Tu contraseña debe tener entre 8 y 20 caracteres, contener al menos '
+            'una letra mayúscula, una minúscula, un carácter especial y no debe '
+            'contener espacios ni emojis.'
         )
