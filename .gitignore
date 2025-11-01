@@ -216,6 +216,11 @@ $RECYCLE.BIN/
 .claude/
 CLAUDE.md
 
+# Ignore files for chatgpt
+.chatgpt/
+CHATGPT.md
+AGENTS.md
+
 # Ignore files for warp.dev
 .warp/
 WARP.md
