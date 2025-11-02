@@ -26,7 +26,7 @@
                                 <span class="page-logo-text mr-1">Aplicación Web</span>
                             </a>
                         </div>
-                        <a href="{% url 'logout' %}" class="btn-link text-white ml-auto mr-2">
+                        <a href="javascript:void(0);" id="logout-link" class="btn-link text-white ml-auto mr-2">
                             Cerrar Sesión
                         </a>
                         <a href="javascript:void(0);" id="theme-toggle" class="btn-link text-white" title="Cambiar tema">
@@ -98,9 +98,9 @@
                                     </div>
 
                                     <div class="mt-4 d-flex justify-content-between align-items-center">
-                                        <a href="{% url 'logout' %}" class="btn btn-danger">
+                                        <button type="button" class="btn btn-danger" id="logout-button">
                                             <i class="fal fa-sign-out"></i> Cerrar Sesión
-                                        </a>
+                                        </button>
                                         <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">
                                             <i class="fal fa-user-times"></i> Eliminar Cuenta
                                         </button>
@@ -184,6 +184,39 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación para Cerrar Sesión -->
+    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" role="dialog" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="logoutConfirmModalLabel">
+                        <i class="fal fa-sign-out"></i> Confirmar Cierre de Sesión
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fal fa-question-circle fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="text-center mb-3">¿Estás seguro de que deseas cerrar sesión?</h5>
+                    <p class="text-muted text-center mb-0">
+                        Se cerrará tu sesión actual y tendrás que volver a iniciar sesión para acceder al sistema.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fal fa-times"></i> Cancelar
+                    </button>
+                    <a href="{% url 'logout' %}" class="btn btn-warning" id="confirmLogoutBtn">
+                        <i class="fal fa-sign-out"></i> Sí, cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Confirmación para Eliminar Cuenta -->
     <div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -253,5 +286,6 @@
     <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
     <script src="{% static 'app_1/js/dashboard.js' %}"></script>
     <script src="{% static 'app_1/js/session-timeout.js' %}"></script>
+    <script src="{% static 'app_1/js/logout-confirm-modal.js' %}"></script>
     <script src="{% static 'app_1/js/delete-account-modal.js' %}"></script>
 {% endblock %}
