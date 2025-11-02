@@ -253,16 +253,5 @@
     <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
     <script src="{% static 'app_1/js/dashboard.js' %}"></script>
     <script src="{% static 'app_1/js/session-timeout.js' %}"></script>
-    <script>
-        // Habilitar botón de eliminación cuando se marca el checkbox
-        document.getElementById('confirmDelete').addEventListener('change', function() {
-            document.getElementById('confirmDeleteBtn').disabled = !this.checked;
-        });
-
-        // Limpiar el formulario al cerrar el modal
-        $('#deleteAccountModal').on('hidden.bs.modal', function () {
-            document.getElementById('deleteAccountForm').reset();
-            document.getElementById('confirmDeleteBtn').disabled = true;
-        });
-    </script>
+    <script src="{% static 'app_1/js/delete-account-modal.js' %}"></script>
 {% endblock %}
