@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu cuenta ha sido eliminada</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">{{ site_name }}</h1>
+    </div>
+
+    <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #dc3545;">Adiós, {{ user.first_name }}</h2>
+
+        <p>Tu cuenta en {{ site_name }} ha sido <strong>eliminada permanentemente</strong> según tu solicitud.</p>
+
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <h3 style="margin-top: 0; color: #856404;">Detalles de la eliminación:</h3>
+            <ul style="color: #856404; margin-bottom: 0;">
+                <li><strong>Fecha y hora:</strong> {{ deletion_time|date:"d/m/Y H:i" }}</li>
+                <li><strong>Correo electrónico:</strong> {{ user.email }}</li>
+                <li><strong>Estado:</strong> Todos tus datos han sido eliminados</li>
+            </ul>
+        </div>
+
+        <div style="background-color: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; color: #0c5460;">
+                <strong>Lo que se ha eliminado:</strong>
+            </p>
+            <ul style="color: #0c5460; margin-top: 10px; margin-bottom: 0;">
+                <li>Tu perfil de usuario y datos personales</li>
+                <li>Todas tus sesiones activas</li>
+                <li>Tus preferencias y configuraciones</li>
+                <li>Tu historial en la aplicación</li>
+            </ul>
+        </div>
+
+        <p>Lamentamos verte partir. Si deseas crear una nueva cuenta en el futuro, siempre serás bienvenido.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ site_url }}/register/" style="background-color: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Crear una nueva cuenta
+            </a>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <p style="color: #666; font-size: 12px;">
+                <strong>¿Tienes comentarios?</strong> Si deseas compartir tu experiencia o sugerencias para mejorar,
+                nos encantaría escucharte en <a href="{{ site_url }}" style="color: #667eea;">{{ site_url }}</a>
+            </p>
+            <p style="color: #666; font-size: 12px;">
+                Si no solicitaste la eliminación de tu cuenta, por favor contacta inmediatamente con nuestro equipo de soporte.
+            </p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+        <p>&copy; 2020 {{ site_name }}. Todos los derechos reservados.</p>
+    </div>
+</body>
+</html>

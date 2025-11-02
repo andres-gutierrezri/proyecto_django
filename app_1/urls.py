@@ -23,4 +23,7 @@ urlpatterns = [
 
     # Gestión de sesiones
     path('terminate-session/<str:session_key>/', views.terminate_session, name='terminate_session'),
+
+    # Gestión de cuenta
+    path('delete-account/', views.delete_account, name='delete_account'),
 ]

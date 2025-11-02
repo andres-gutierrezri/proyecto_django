@@ -97,10 +97,13 @@
                                         <strong>Nota:</strong> Este es tu panel de control. Aquí podrás gestionar tu cuenta y acceder a las funcionalidades de la aplicación.
                                     </div>
 
-                                    <div class="mt-4">
+                                    <div class="mt-4 d-flex justify-content-between align-items-center">
                                         <a href="{% url 'logout' %}" class="btn btn-danger">
                                             <i class="fal fa-sign-out"></i> Cerrar Sesión
                                         </a>
+                                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">
+                                            <i class="fal fa-user-times"></i> Eliminar Cuenta
+                                        </button>
                                     </div>
                                 </div>
 
@@ -180,10 +183,86 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Confirmación para Eliminar Cuenta -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">
+                        <i class="fal fa-exclamation-triangle"></i> Eliminar Cuenta Permanentemente
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="{% url 'delete_account' %}" id="deleteAccountForm">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="alert alert-danger" role="alert">
+                            <strong><i class="fal fa-exclamation-circle"></i> ¡Advertencia!</strong>
+                            <p class="mb-0">Esta acción es <strong>irreversible</strong>. Al eliminar tu cuenta:</p>
+                            <ul class="mb-0 mt-2">
+                                <li>Se eliminarán todos tus datos personales</li>
+                                <li>Se cerrarán todas tus sesiones activas</li>
+                                <li>No podrás recuperar tu cuenta</li>
+                                <li>Perderás acceso a todos los servicios</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deletePassword" class="fw-500">
+                                <i class="fal fa-lock"></i> Confirma tu contraseña para continuar
+                            </label>
+                            <input
+                                type="password"
+                                class="form-control form-control-lg"
+                                id="deletePassword"
+                                name="password"
+                                placeholder="Ingresa tu contraseña actual"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <small class="form-text text-muted">
+                                Por seguridad, debes ingresar tu contraseña para confirmar la eliminación.
+                            </small>
+                        </div>
+
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="confirmDelete" required>
+                            <label class="custom-control-label" for="confirmDelete">
+                                Entiendo que esta acción es permanente e irreversible
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fal fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                            <i class="fal fa-trash-alt"></i> Eliminar mi cuenta permanentemente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
     <script src="{% static 'app_1/js/dashboard.js' %}"></script>
     <script src="{% static 'app_1/js/session-timeout.js' %}"></script>
+    <script>
+        // Habilitar botón de eliminación cuando se marca el checkbox
+        document.getElementById('confirmDelete').addEventListener('change', function() {
+            document.getElementById('confirmDeleteBtn').disabled = !this.checked;
+        });
+
+        // Limpiar el formulario al cerrar el modal
+        $('#deleteAccountModal').on('hidden.bs.modal', function () {
+            document.getElementById('deleteAccountForm').reset();
+            document.getElementById('confirmDeleteBtn').disabled = true;
+        });
+    </script>
 {% endblock %}

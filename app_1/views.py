@@ -458,3 +458,62 @@ def password_reset_confirm(request, token):
 
     return render(request, 'app_1/password_reset_confirm.html', context)
 
+
+@login_required
+@require_http_methods(["POST"])
+def delete_account(request):
+    """
+    Vista para eliminar la cuenta del usuario actual.
+    Requiere confirmación mediante contraseña.
+    """
+    password = request.POST.get('password', '')
+
+    # Verificar la contraseña del usuario
+    if not request.user.check_password(password):
+        messages.error(
+            request,
+            'Contraseña incorrecta. No se pudo eliminar la cuenta.'
+        )
+        return redirect('dashboard')
+
+    try:
+        # Guardar información del usuario antes de eliminar
+        user_email = request.user.email
+        user_name = request.user.get_full_name()
+
+        # Eliminar todas las sesiones del usuario
+        try:
+            UserSession.objects.filter(user=request.user).delete()
+        except Exception:
+            pass  # Continuar aunque falle
+
+        # Enviar email de confirmación de eliminación
+        try:
+            from .utils import send_account_deleted_email
+            send_account_deleted_email(request.user, request)
+        except Exception:
+            pass  # No interrumpir si falla el email
+
+        # Eliminar el usuario (esto hará logout automáticamente)
+        request.user.delete()
+
+        # Hacer logout explícito
+        logout(request)
+
+        messages.success(
+            request,
+            f'Tu cuenta ha sido eliminada exitosamente. '
+            f'Lamentamos verte partir. Si cambias de opinión, '
+            f'siempre puedes crear una nueva cuenta.'
+        )
+
+    except Exception as e:
+        messages.error(
+            request,
+            'Ocurrió un error al eliminar tu cuenta. '
+            'Por favor intenta de nuevo o contacta al soporte.'
+        )
+        return redirect('dashboard')
+
+    return redirect('page_login')
+

@@ -272,3 +272,60 @@ El equipo de Aplicación Web
         html_message=html_message,
         fail_silently=True,  # No fallar si el email no se puede enviar
     )
+
+
+def send_account_deleted_email(user, request):
+    """
+    Envía un email de confirmación cuando la cuenta ha sido eliminada.
+
+    Args:
+        user: Instancia del modelo CustomUser
+        request: Objeto HttpRequest para construir URLs absolutas
+    """
+    # Construir URL completa del sitio
+    site_url = request.build_absolute_uri('/').rstrip('/')
+    deletion_time = timezone.now()
+
+    # Crear mensaje de texto plano limpio y legible
+    plain_message = f"""
+Hola {user.get_full_name() or user.username},
+
+Tu cuenta en Aplicación Web ha sido eliminada permanentemente.
+
+Detalles de la eliminación:
+- Fecha y hora: {deletion_time.strftime('%d/%m/%Y %H:%M')}
+- Correo electrónico: {user.email}
+
+Todos tus datos personales han sido eliminados de nuestros sistemas.
+
+Si deseas crear una nueva cuenta en el futuro, siempre serás bienvenido en {site_url}
+
+Lamentamos verte partir. Si tienes algún comentario sobre tu experiencia, nos encantaría escucharlo.
+
+Saludos,
+El equipo de Aplicación Web
+    """.strip()
+
+    # Renderizar HTML solo en producción
+    html_message = None
+    if settings.IS_DEPLOYED:
+        context = {
+            'user': user,
+            'deletion_time': deletion_time,
+            'site_name': 'Aplicación Web',
+            'site_url': site_url,
+        }
+        html_message = render_to_string(
+            'app_1/emails/account_deleted_email.html',
+            context
+        )
+
+    # Enviar el email
+    send_mail(
+        subject='Tu cuenta ha sido eliminada - Aplicación Web',
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
+        html_message=html_message,
+        fail_silently=True,  # No fallar si el email no se puede enviar
+    )
