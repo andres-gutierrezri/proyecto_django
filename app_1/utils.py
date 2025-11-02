@@ -282,9 +282,14 @@ def send_account_deleted_email(user, request):
         user: Instancia del modelo CustomUser
         request: Objeto HttpRequest para construir URLs absolutas
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     # Construir URL completa del sitio
     site_url = request.build_absolute_uri('/').rstrip('/')
     deletion_time = timezone.now()
+    
+    logger.info(f"Preparando email de eliminación de cuenta para: {user.email}")
 
     # Crear mensaje de texto plano limpio y legible
     plain_message = f"""
@@ -309,23 +314,39 @@ El equipo de Aplicación Web
     # Renderizar HTML solo en producción
     html_message = None
     if settings.IS_DEPLOYED:
-        context = {
-            'user': user,
-            'deletion_time': deletion_time,
-            'site_name': 'Aplicación Web',
-            'site_url': site_url,
-        }
-        html_message = render_to_string(
-            'app_1/emails/account_deleted_email.html',
-            context
-        )
+        logger.info("Renderizando template HTML para email")
+        try:
+            context = {
+                'user': user,
+                'deletion_time': deletion_time,
+                'site_name': 'Aplicación Web',
+                'site_url': site_url,
+            }
+            html_message = render_to_string(
+                'app_1/emails/account_deleted_email.html',
+                context
+            )
+        except Exception as e:
+            logger.error(f"Error al renderizar template HTML: {str(e)}")
+            # Continuar sin HTML
+    else:
+        logger.info("Modo desarrollo: solo se enviará texto plano")
 
     # Enviar el email
-    send_mail(
-        subject='Tu cuenta ha sido eliminada - Aplicación Web',
-        message=plain_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        html_message=html_message,
-        fail_silently=True,  # No fallar si el email no se puede enviar
-    )
+    try:
+        logger.info(f"Enviando email de eliminación a: {user.email}")
+        logger.info(f"FROM: {settings.DEFAULT_FROM_EMAIL}")
+        logger.info(f"BACKEND: {settings.EMAIL_BACKEND}")
+        
+        send_mail(
+            subject='Tu cuenta ha sido eliminada - Aplicación Web',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False,  # Mostrar errores para debugging
+        )
+        logger.info("Email de eliminación enviado exitosamente")
+    except Exception as e:
+        logger.error(f"Error al enviar email de eliminación: {str(e)}", exc_info=True)
+        raise  # Re-lanzar para que el caller lo maneje
