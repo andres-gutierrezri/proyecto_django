@@ -46,6 +46,29 @@
                                 </h2>
                             </div>
                             <div class="col-xl-8 ml-auto mr-auto">
+                                <!-- Mensajes de Django -->
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                            <strong>
+                                                {% if message.tags == 'error' or message.tags == 'danger' %}
+                                                    <i class="fal fa-exclamation-circle"></i>
+                                                {% elif message.tags == 'warning' %}
+                                                    <i class="fal fa-exclamation-triangle"></i>
+                                                {% elif message.tags == 'success' %}
+                                                    <i class="fal fa-check-circle"></i>
+                                                {% else %}
+                                                    <i class="fal fa-info-circle"></i>
+                                                {% endif %}
+                                            </strong>
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
                                 <div class="card p-4 rounded-plus bg-faded">
                                     <h3 class="mb-4">Información de tu cuenta</h3>
                                     <div class="row">
