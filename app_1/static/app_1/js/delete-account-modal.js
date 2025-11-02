@@ -101,11 +101,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * Validación adicional antes de enviar el formulario
      */
     deleteAccountForm.addEventListener('submit', function(event) {
+        // Prevenir el envío por defecto
+        event.preventDefault();
+
         const passwordInput = document.getElementById('deletePassword');
 
         // Validar que se haya ingresado una contraseña
         if (!passwordInput.value.trim()) {
-            event.preventDefault();
             alert('Por favor, ingresa tu contraseña para confirmar la eliminación.');
             passwordInput.focus();
             return false;
@@ -113,31 +115,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validar que el checkbox esté marcado
         if (!confirmCheckbox.checked) {
-            event.preventDefault();
             alert('Debes confirmar que entiendes que esta acción es irreversible.');
             confirmCheckbox.focus();
             return false;
         }
 
-        // Confirmación final
-        const userConfirmed = confirm(
-            '⚠️ ÚLTIMA ADVERTENCIA ⚠️\n\n' +
-            'Esta acción es PERMANENTE e IRREVERSIBLE.\n\n' +
-            'Se eliminarán:\n' +
-            '• Todos tus datos personales\n' +
-            '• Todas tus sesiones activas\n' +
-            '• Tu acceso a todos los servicios\n\n' +
-            '¿Estás absolutamente seguro de que deseas continuar?'
-        );
+        // Cerrar el modal actual y abrir el modal de última advertencia
+        deleteAccountModal.modal('hide');
 
-        if (!userConfirmed) {
-            event.preventDefault();
-            return false;
-        }
+        setTimeout(function() {
+            $('#finalWarningModal').modal('show');
+        }, 300);
 
-        // Si llegamos aquí, el usuario confirmó todo
-        // Deshabilitar el botón para evitar envíos duplicados
-        confirmButton.disabled = true;
-        confirmButton.innerHTML = '<i class="fal fa-spinner fa-spin"></i> Eliminando...';
+        return false;
     });
+
+    /**
+     * Manejo del modal de última advertencia
+     */
+    const finalWarningModal = $('#finalWarningModal');
+    const cancelFinalWarning = document.getElementById('cancelFinalWarning');
+    const confirmFinalDeletion = document.getElementById('confirmFinalDeletion');
+
+    // Botón "No, mantener mi cuenta" - volver al modal anterior
+    if (cancelFinalWarning) {
+        cancelFinalWarning.addEventListener('click', function() {
+            finalWarningModal.modal('hide');
+            setTimeout(function() {
+                deleteAccountModal.modal('show');
+            }, 300);
+        });
+    }
+
+    // Botón "Sí, eliminar permanentemente" - enviar el formulario
+    if (confirmFinalDeletion) {
+        confirmFinalDeletion.addEventListener('click', function() {
+            // Deshabilitar el botón para evitar clics duplicados
+            this.disabled = true;
+            this.innerHTML = '<i class="fal fa-spinner fa-spin"></i> Eliminando cuenta...';
+
+            // Cambiar también el botón del modal original
+            confirmButton.disabled = true;
+            confirmButton.innerHTML = '<i class="fal fa-spinner fa-spin"></i> Eliminando...';
+
+            // Enviar el formulario
+            deleteAccountForm.submit();
+        });
+    }
 });

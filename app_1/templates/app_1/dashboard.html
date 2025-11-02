@@ -269,6 +269,64 @@
         </div>
     </div>
 
+    <!-- Modal de Última Advertencia para Eliminar Cuenta -->
+    <div class="modal fade" id="finalWarningModal" tabindex="-1" role="dialog" aria-labelledby="finalWarningModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="finalWarningModalLabel">
+                        <i class="fal fa-exclamation-triangle fa-lg"></i> ÚLTIMA ADVERTENCIA
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fal fa-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+
+                    <h4 class="text-center text-danger mb-4">
+                        <strong>Esta acción es PERMANENTE e IRREVERSIBLE</strong>
+                    </h4>
+
+                    <div class="alert alert-danger mb-4" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fal fa-trash-alt"></i> Se eliminarán permanentemente:
+                        </h5>
+                        <ul class="mb-0">
+                            <li><strong>Todos tus datos personales</strong> (nombre, email, preferencias)</li>
+                            <li><strong>Todas tus sesiones activas</strong> en todos los dispositivos</li>
+                            <li><strong>Tu acceso completo</strong> a todos los servicios de la plataforma</li>
+                            <li><strong>Tu historial</strong> y configuraciones personalizadas</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-light p-3 rounded mb-3">
+                        <p class="mb-2">
+                            <i class="fal fa-ban text-danger"></i>
+                            <strong>NO PODRÁS:</strong>
+                        </p>
+                        <ul class="mb-0">
+                            <li>Recuperar tu cuenta después de eliminarla</li>
+                            <li>Recuperar ninguno de tus datos</li>
+                            <li>Deshacer esta acción de ninguna manera</li>
+                        </ul>
+                    </div>
+
+                    <h5 class="text-center mt-4 mb-3">
+                        ¿Estás <strong class="text-danger">absolutamente seguro</strong> de que deseas continuar?
+                    </h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-lg btn-success" id="cancelFinalWarning">
+                        <i class="fal fa-arrow-left"></i> No, mantener mi cuenta
+                    </button>
+                    <button type="button" class="btn btn-lg btn-danger" id="confirmFinalDeletion">
+                        <i class="fal fa-trash-alt"></i> Sí, eliminar permanentemente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Confirmación para Eliminar Cuenta -->
     <div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
