@@ -466,10 +466,30 @@ def delete_account(request):
     Vista para eliminar la cuenta del usuario actual.
     Requiere confirmación mediante contraseña.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     password = request.POST.get('password', '')
+    
+    # Debug: Log de información
+    logger.info(f"=== DELETE ACCOUNT REQUEST ===")
+    logger.info(f"Usuario: {request.user.email}")
+    logger.info(f"Password recibido (longitud original): {len(password)}")
+    logger.info(f"Password tiene espacios al inicio: {password != password.lstrip()}")
+    logger.info(f"Password tiene espacios al final: {password != password.rstrip()}")
+    logger.info(f"Datos POST: {list(request.POST.keys())}")
+    
+    # Limpiar espacios en blanco (trim) - común cuando se copia/pega
+    password = password.strip()
+    logger.info(f"Password después de strip (longitud): {len(password)}")
 
     # Verificar la contraseña del usuario
-    if not request.user.check_password(password):
+    password_is_valid = request.user.check_password(password)
+    logger.info(f"Resultado verificación de contraseña: {password_is_valid}")
+    logger.info(f"=== FIN VERIFICACIÓN ===")
+    
+    if not password_is_valid:
+        logger.warning(f"Contraseña incorrecta para usuario: {request.user.email}")
         messages.error(
             request,
             'Contraseña incorrecta. No se pudo eliminar la cuenta.'
@@ -480,40 +500,54 @@ def delete_account(request):
         # Guardar información del usuario antes de eliminar
         user_email = request.user.email
         user_name = request.user.get_full_name()
+        
+        logger.info(f"Iniciando eliminación de cuenta para: {user_email}")
 
         # Eliminar todas las sesiones del usuario
         try:
+            sessions_deleted = UserSession.objects.filter(user=request.user).count()
             UserSession.objects.filter(user=request.user).delete()
-        except Exception:
+            logger.info(f"Sesiones eliminadas: {sessions_deleted}")
+        except Exception as e:
+            logger.error(f"Error al eliminar sesiones: {str(e)}")
             pass  # Continuar aunque falle
 
         # Enviar email de confirmación de eliminación
         try:
             from .utils import send_account_deleted_email
+            logger.info(f"Intentando enviar email de confirmación a: {user_email}")
             send_account_deleted_email(request.user, request)
-        except Exception:
-            pass  # No interrumpir si falla el email
+            logger.info("Email de confirmación enviado exitosamente")
+        except Exception as e:
+            logger.error(f"Error al enviar email de confirmación: {str(e)}")
+            # No interrumpir si falla el email
 
         # Eliminar el usuario (esto hará logout automáticamente)
         request.user.delete()
+        logger.info(f"Usuario {user_email} eliminado exitosamente")
 
-        # Hacer logout explícito
+        # Hacer logout explícito para limpiar la sesión
         logout(request)
+        logger.info("Logout realizado")
 
+        # Mensaje de éxito para mostrar en el login
         messages.success(
             request,
             f'Tu cuenta ha sido eliminada exitosamente. '
-            f'Lamentamos verte partir. Si cambias de opinión, '
+            f'Lamentamos verte partir, {user_name}. Si cambias de opinión, '
             f'siempre puedes crear una nueva cuenta.'
         )
 
     except Exception as e:
+        logger.error(f"Error al eliminar cuenta: {str(e)}", exc_info=True)
         messages.error(
             request,
-            'Ocurrió un error al eliminar tu cuenta. '
-            'Por favor intenta de nuevo o contacta al soporte.'
+            f'Ocurrió un error al eliminar tu cuenta: {str(e)}. '
+            f'Por favor intenta de nuevo o contacta al soporte.'
         )
         return redirect('dashboard')
 
+    # Redirigir al login después de eliminar la cuenta
+    logger.info("Redirigiendo al login")
     return redirect('page_login')
 
