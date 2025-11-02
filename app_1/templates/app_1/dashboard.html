@@ -177,6 +177,13 @@
                                         Has iniciado sesión en múltiples dispositivos. Si no reconoces alguna de estas sesiones, ciérrala inmediatamente y cambia tu contraseña.
                                     </div>
 
+                                    <!-- Botón para cerrar todas las sesiones excepto la actual -->
+                                    <div class="mb-3">
+                                        <button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#closeAllSessionsModal">
+                                            <i class="fal fa-sign-out-alt"></i> Cerrar todas las demás sesiones
+                                        </button>
+                                    </div>
+
                                     <div class="list-group">
                                         {% for session in active_sessions %}
                                         <div class="list-group-item {% if session.session_key == current_session_key %}border-success{% endif %}">
@@ -204,9 +211,14 @@
                                                 </div>
                                                 {% if session.session_key != current_session_key %}
                                                 <div class="ml-3">
-                                                    <form method="post" action="{% url 'terminate_session' session.session_key %}" style="display: inline;">
+                                                    <form method="post" action="{% url 'terminate_session' session.session_key %}" class="terminate-session-form" style="display: inline;">
                                                         {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que deseas cerrar esta sesión?')">
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-danger btn-terminate-session" 
+                                                                data-session-key="{{ session.session_key }}"
+                                                                data-device-info="{{ session.get_device_info }}"
+                                                                data-ip="{{ session.ip_address }}"
+                                                                data-last-activity="{{ session.last_activity|date:'d/m/Y H:i' }}">
                                                             <i class="fal fa-times-circle"></i> Cerrar sesión
                                                         </button>
                                                     </form>
@@ -231,6 +243,174 @@
                             2020 &copy; SmartAdmin by&nbsp;<a href='https://www.gotbootstrap.com' class='text-white opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>gotbootstrap.com</a>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cerrar Todas las Sesiones -->
+    <div class="modal fade" id="closeAllSessionsModal" tabindex="-1" role="dialog" aria-labelledby="closeAllSessionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="closeAllSessionsModalLabel">
+                        <i class="fal fa-shield-check"></i> Cerrar Todas las Demás Sesiones
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fal fa-shield-check text-warning" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h5 class="text-center mb-4">
+                        ¿Deseas cerrar todas las sesiones activas excepto la actual?
+                    </h5>
+
+                    <div class="alert alert-info mb-3" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fal fa-info-circle"></i> Esta acción cerrará:
+                        </h6>
+                        <ul class="mb-0">
+                            <li><strong>{{ sessions_count|add:"-1" }} sesión{% if sessions_count > 2 %}es{% endif %}</strong> en otros dispositivos</li>
+                            <li>Todas las sesiones <strong>excepto la sesión actual</strong></li>
+                            <li>Tendrás que volver a iniciar sesión en esos dispositivos</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h6 class="mb-2">
+                            <i class="fal fa-laptop text-primary"></i> Sesiones que se cerrarán:
+                        </h6>
+                        <div class="list-unstyled mb-0">
+                            {% for session in active_sessions %}
+                                {% if session.session_key != current_session_key %}
+                                <div class="d-flex align-items-start mb-2">
+                                    <i class="fal fa-times-circle text-danger mt-1 mr-2"></i>
+                                    <div>
+                                        <strong>{{ session.get_device_info }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            IP: {{ session.ip_address }} | Última actividad: {{ session.last_activity|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success mb-0" role="alert">
+                        <h6 class="mb-1">
+                            <i class="fal fa-check-circle"></i> Sesión que permanecerá activa:
+                        </h6>
+                        {% for session in active_sessions %}
+                            {% if session.session_key == current_session_key %}
+                            <div class="d-flex align-items-start">
+                                <i class="fal fa-desktop text-success mt-1 mr-2"></i>
+                                <div>
+                                    <strong>{{ session.get_device_info }}</strong> <span class="badge badge-success ml-1">Actual</span>
+                                    <br>
+                                    <small class="text-muted">
+                                        IP: {{ session.ip_address }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fal fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmCloseAllSessions">
+                        <i class="fal fa-sign-out-alt"></i> Sí, cerrar todas las demás sesiones
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito al Cerrar Sesiones -->
+    <div class="modal fade" id="sessionsClosedSuccessModal" tabindex="-1" role="dialog" aria-labelledby="sessionsClosedSuccessModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="sessionsClosedSuccessModalLabel">
+                        <i class="fal fa-check-circle"></i> Sesiones Cerradas
+                    </h5>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <i class="fal fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h4 class="mb-3">¡Sesiones cerradas exitosamente!</h4>
+                    <p class="mb-2" id="sessionsClosedMessage">
+                        Se cerraron exitosamente <strong id="closedSessionsCount">0</strong> sesión(es).
+                    </p>
+                    <p class="text-muted mb-0">
+                        La página se recargará automáticamente en <strong id="reloadCountdown">3</strong> segundos...
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" id="reloadNowBtn">
+                        <i class="fal fa-sync"></i> Recargar ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cerrar Sesión Individual -->
+    <div class="modal fade" id="terminateSessionModal" tabindex="-1" role="dialog" aria-labelledby="terminateSessionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="terminateSessionModalLabel">
+                        <i class="fal fa-exclamation-triangle"></i> Cerrar Sesión
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fal fa-question-circle fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="text-center mb-3">¿Estás seguro de que deseas cerrar esta sesión?</h5>
+                    
+                    <div class="alert alert-warning mb-3" role="alert">
+                        <h6 class="mb-2">
+                            <i class="fal fa-info-circle"></i> Se cerrará la sesión:
+                        </h6>
+                        <div class="d-flex align-items-start">
+                            <i class="fal fa-desktop mt-1 mr-2"></i>
+                            <div>
+                                <strong id="modalDeviceInfo"></strong>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fal fa-map-marker-alt"></i> IP: <span id="modalIpAddress"></span>
+                                    <br>
+                                    <i class="fal fa-clock"></i> Última actividad: <span id="modalLastActivity"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted text-center mb-0">
+                        Tendrás que volver a iniciar sesión en ese dispositivo.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fal fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmTerminateSession">
+                        <i class="fal fa-times-circle"></i> Sí, cerrar sesión
+                    </button>
                 </div>
             </div>
         </div>
@@ -407,4 +587,6 @@
     <script src="{% static 'app_1/js/session-timeout.js' %}"></script>
     <script src="{% static 'app_1/js/logout-confirm-modal.js' %}"></script>
     <script src="{% static 'app_1/js/delete-account-modal.js' %}"></script>
+    <script src="{% static 'app_1/js/close-all-sessions-modal.js' %}"></script>
+    <script src="{% static 'app_1/js/terminate-session-modal.js' %}"></script>
 {% endblock %}
