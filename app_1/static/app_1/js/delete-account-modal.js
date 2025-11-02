@@ -9,12 +9,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmButton = document.getElementById('confirmDeleteBtn');
     const deleteAccountForm = document.getElementById('deleteAccountForm');
     const deleteAccountModal = $('#deleteAccountModal');
+    const passwordInput = document.getElementById('deletePassword');
+    const errorAlert = document.getElementById('deleteAccountError');
+    const errorMessage = document.getElementById('deleteAccountErrorMessage');
 
     // Verificar que los elementos existen
     if (!confirmCheckbox || !confirmButton || !deleteAccountForm) {
         console.warn('Elementos del modal de eliminación de cuenta no encontrados');
         return;
     }
+
+    /**
+     * Detectar si hay un mensaje de error de contraseña incorrecta al cargar la página
+     * y reabrir el modal automáticamente
+     */
+    const checkPasswordError = function() {
+        // Buscar mensajes de error en la página
+        const alertMessages = document.querySelectorAll('.alert-danger, .alert-error');
+        let hasPasswordError = false;
+
+        alertMessages.forEach(function(alert) {
+            if (alert.textContent.includes('Contraseña incorrecta') ||
+                alert.textContent.includes('contraseña') && alert.textContent.includes('eliminar')) {
+                hasPasswordError = true;
+
+                // Copiar el mensaje al modal
+                if (errorMessage && errorAlert) {
+                    errorMessage.textContent = 'La contraseña ingresada es incorrecta. Por favor, verifica e intenta nuevamente.';
+                    errorAlert.classList.remove('d-none');
+                }
+
+                // Marcar el input como inválido
+                if (passwordInput) {
+                    passwordInput.classList.add('is-invalid');
+                }
+            }
+        });
+
+        // Si hay error de contraseña, abrir el modal automáticamente
+        if (hasPasswordError && deleteAccountModal.length) {
+            setTimeout(function() {
+                deleteAccountModal.modal('show');
+                // Enfocar el campo de contraseña
+                if (passwordInput) {
+                    passwordInput.focus();
+                    passwordInput.select();
+                }
+            }, 500);
+        }
+    };
+
+    // Ejecutar al cargar la página
+    checkPasswordError();
 
     /**
      * Habilitar/deshabilitar botón de eliminación basado en checkbox
@@ -24,6 +70,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     /**
+     * Ocultar mensaje de error cuando el usuario empieza a escribir
+     */
+    if (passwordInput && errorAlert) {
+        passwordInput.addEventListener('input', function() {
+            errorAlert.classList.add('d-none');
+            passwordInput.classList.remove('is-invalid');
+        });
+    }
+
+    /**
      * Limpiar el formulario al cerrar el modal
      * Esto asegura que el usuario deba confirmar nuevamente si vuelve a abrir el modal
      */
@@ -31,6 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteAccountModal.on('hidden.bs.modal', function () {
             deleteAccountForm.reset();
             confirmButton.disabled = true;
+            // Ocultar mensajes de error
+            if (errorAlert) {
+                errorAlert.classList.add('d-none');
+            }
+            if (passwordInput) {
+                passwordInput.classList.remove('is-invalid');
+            }
         });
     }
 

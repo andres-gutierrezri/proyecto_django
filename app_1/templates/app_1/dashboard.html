@@ -261,6 +261,12 @@
                 <form method="post" action="{% url 'delete_account' %}" id="deleteAccountForm">
                     {% csrf_token %}
                     <div class="modal-body">
+                        <!-- Área de mensajes de error -->
+                        <div id="deleteAccountError" class="alert alert-warning d-none" role="alert">
+                            <strong><i class="fal fa-exclamation-triangle"></i> Error:</strong>
+                            <span id="deleteAccountErrorMessage"></span>
+                        </div>
+
                         <div class="alert alert-danger" role="alert">
                             <strong><i class="fal fa-exclamation-circle"></i> ¡Advertencia!</strong>
                             <p class="mb-0">Esta acción es <strong>irreversible</strong>. Al eliminar tu cuenta:</p>
@@ -286,8 +292,11 @@
                                 autocomplete="current-password"
                             >
                             <small class="form-text text-muted">
-                                Por seguridad, debes ingresar tu contraseña para confirmar la eliminación.
+                                Por seguridad, debes ingresar tu contraseña actual para confirmar la eliminación.
                             </small>
+                            <div class="invalid-feedback" id="passwordError">
+                                La contraseña ingresada es incorrecta.
+                            </div>
                         </div>
 
                         <div class="custom-control custom-checkbox">
