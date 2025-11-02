@@ -79,7 +79,7 @@
                                                 <p class="form-control-plaintext user-info-value">{{ user.date_joined|date:"d/m/Y" }}</p>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label fw-500">Suscripción al boletín</label>
                                                 <p class="form-control-plaintext">
@@ -91,19 +91,48 @@
                                                 </p>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Rol de usuario</label>
+                                                <p class="form-control-plaintext">
+                                                    {% if user.is_superuser %}
+                                                        <span class="badge badge-danger">
+                                                            <i class="fal fa-crown"></i> Superadministrador
+                                                        </span>
+                                                    {% elif user.is_staff %}
+                                                        <span class="badge badge-primary">
+                                                            <i class="fal fa-user-shield"></i> Administrador
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge badge-secondary">
+                                                            <i class="fal fa-user"></i> Usuario
+                                                        </span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="alert alert-info mt-3" role="alert">
                                         <strong>Nota:</strong> Este es tu panel de control. Aquí podrás gestionar tu cuenta y acceder a las funcionalidades de la aplicación.
                                     </div>
 
-                                    <div class="mt-4 d-flex justify-content-between align-items-center">
-                                        <button type="button" class="btn btn-danger" id="logout-button">
-                                            <i class="fal fa-sign-out"></i> Cerrar Sesión
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">
-                                            <i class="fal fa-user-times"></i> Eliminar Cuenta
-                                        </button>
+                                    <div class="mt-4">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <button type="button" class="btn btn-danger mb-2" id="logout-button">
+                                                <i class="fal fa-sign-out"></i> Cerrar Sesión
+                                            </button>
+                                            <div class="mb-2">
+                                                {% if user.is_staff %}
+                                                <a href="{% url 'admin:index' %}" class="btn btn-primary mr-2" target="_blank">
+                                                    <i class="fal fa-user-shield"></i> Panel de Administración
+                                                </a>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">
+                                                    <i class="fal fa-user-times"></i> Eliminar Cuenta
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
