@@ -150,6 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botón "Sí, eliminar permanentemente" - enviar el formulario
     if (confirmFinalDeletion) {
         confirmFinalDeletion.addEventListener('click', function() {
+            // Limpiar espacios en blanco de la contraseña antes de enviar
+            const passwordInput = document.getElementById('deletePassword');
+            if (passwordInput && passwordInput.value) {
+                passwordInput.value = passwordInput.value.trim();
+            }
+
             // Deshabilitar el botón para evitar clics duplicados
             this.disabled = true;
             this.innerHTML = '<i class="fal fa-spinner fa-spin"></i> Eliminando cuenta...';
