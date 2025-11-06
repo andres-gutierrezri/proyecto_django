@@ -245,52 +245,61 @@ Get-ExecutionPolicy -List
 ```
 
 ### Verificar la instalación de Python y pip
+
+**Windows:**
 ```bash
 # Comprobar la versión de Python
-# Windows
 python --version
-# macOS/Linux
+
+# Verificar la instalación de pip
+pip --version
+
+# Actualizar pip
+python -m pip install --upgrade pip --no-cache-dir
+```
+
+**Linux / macOS ARM:**
+```bash
+# Comprobar la versión de Python
 python3 --version
 
 # Verificar la instalación de pip
-# Windows
-pip --version
-# macOS/Linux
 pip3 --version
 
 # Actualizar pip
-# Windows
-python.exe -m pip install --upgrade pip --no-cache-dir
-# macOS/Linux
 python3 -m pip install --upgrade pip --no-cache-dir
-
-# Actualizar pip a la última versión
-pip install --upgrade pip
 ```
 
 ### Instalar entorno virtual de Python
+
+**Windows:**
 ```bash
 # Crear entorno virtual
-# Windows
 python -m venv .venv
-# macOS/Linux
-python3 -m venv .venv
 
 # Activar el entorno virtual
-# Windows
 .\.venv\Scripts\activate
-# macOS/Linux
-source .venv/bin/activate
 
 # Comprobar que el entorno virtual está activado
-# Debe mostrar la ruta del entorno virtual
-# Windows
 python -c "import sys; print(sys.prefix)"
-# macOS/Linux
-python3 -c "import sys; print(sys.prefix)"
 
 # Actualizar pip dentro del entorno virtual
 python -m pip install --upgrade pip --no-cache-dir
+```
+
+**Linux / macOS ARM:**
+```bash
+# Crear entorno virtual
+python3 -m venv .venv
+
+# Activar el entorno virtual
+source .venv/bin/activate
+
+# Comprobar que el entorno virtual está activado
+python3 -c "import sys; print(sys.prefix)"
+
+# Actualizar pip dentro del entorno virtual
+python3 -m pip install --upgrade pip --no-cache-dir
 ```
 
 ### Instalar dependencias del proyecto
@@ -341,16 +350,18 @@ MYSQL_DB_PORT=3306
 
 Utilice los scripts de inicio automático que configuran el entorno completo:
 
+**Windows:**
 ```bash
-# Windows
 start_server.bat
+# O usando Python:
+python start_server.py
+```
 
-# macOS/Linux
+**Linux / macOS ARM:**
+```bash
 ./start_server.sh
-
-# Multiplataforma (Python)
-python start_server.py      # Windows
-python3 start_server.py     # macOS/Linux
+# O usando Python:
+python3 start_server.py
 ```
 
 **Estos scripts automáticamente:**
@@ -365,30 +376,46 @@ python3 start_server.py     # macOS/Linux
 
 Si prefiere ejecutar los pasos manualmente:
 
+**Windows:**
 ```bash
 # Activar entorno virtual
-source .venv/bin/activate  # macOS/Linux
-.venv\Scripts\activate     # Windows
+.\.venv\Scripts\activate
 
 # Crear migraciones (si hay cambios en modelos)
-python manage.py makemigrations   # Windows
-python3 manage.py makemigrations  # macOS/Linux
+python manage.py makemigrations
 
 # Aplicar migraciones
-python manage.py migrate          # Windows
-python3 manage.py migrate         # macOS/Linux
+python manage.py migrate
 
 # Crear superusuario (opcional, para acceder al admin)
-python manage.py createsuperuser  # Windows
-python3 manage.py createsuperuser # macOS/Linux
+python manage.py createsuperuser
 
 # Recolectar archivos estáticos (para producción)
-python manage.py collectstatic    # Windows
-python3 manage.py collectstatic   # macOS/Linux
+python manage.py collectstatic
 
 # Iniciar servidor de desarrollo
-python manage.py runserver        # Windows
-python3 manage.py runserver       # macOS/Linux
+python manage.py runserver
+```
+
+**Linux / macOS ARM:**
+```bash
+# Activar entorno virtual
+source .venv/bin/activate
+
+# Crear migraciones (si hay cambios en modelos)
+python3 manage.py makemigrations
+
+# Aplicar migraciones
+python3 manage.py migrate
+
+# Crear superusuario (opcional, para acceder al admin)
+python3 manage.py createsuperuser
+
+# Recolectar archivos estáticos (para producción)
+python3 manage.py collectstatic
+
+# Iniciar servidor de desarrollo
+python3 manage.py runserver
 ```
 
 ### Acceder a la Aplicación
@@ -557,11 +584,23 @@ Aquí verás:
 
 Para gestionar usuarios desde el admin de Django:
 
+**Windows:**
+```bash
+# 1. Crear un superusuario
+.\.venv\Scripts\activate
+python manage.py createsuperuser
+
+# 2. Acceder al panel de administración
+http://127.0.0.1:8000/admin/
+
+# 3. Gestionar usuarios, permisos y más
+```
+
+**Linux / macOS ARM:**
 ```bash
 # 1. Crear un superusuario
 source .venv/bin/activate
-python3 manage.py createsuperuser  # macOS/Linux
-python manage.py createsuperuser   # Windows
+python3 manage.py createsuperuser
 
 # 2. Acceder al panel de administración
 http://127.0.0.1:8000/admin/
@@ -691,17 +730,24 @@ app_1/templates/app_1/emails/
 
 Para implementar autenticación con Google OAuth:
 
-1. Instalar `django-allauth`:
+1. **Instalar `django-allauth`:**
+
+   **Windows:**
    ```bash
    pip install django-allauth
    ```
 
-2. Configurar en `settings.py`:
+   **Linux / macOS ARM:**
+   ```bash
+   pip3 install django-allauth
+   ```
+
+2. **Configurar en `settings.py`:**
    ```python
    INSTALLED_APPS += ['allauth', 'allauth.account', 'allauth.socialaccount', 'allauth.socialaccount.providers.google']
    ```
 
-3. Configurar credenciales de Google Cloud Console
+3. **Configurar credenciales de Google Cloud Console**
 
 **Nota**: El sistema actual está preparado para esta integración futura.
 
