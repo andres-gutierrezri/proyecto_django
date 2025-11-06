@@ -196,16 +196,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configura la ruta de los archivos estáticos
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+# Directorio donde se recolectan todos los archivos estáticos para producción
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Almacenamiento de archivos estáticos para producción (Whitenoise)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# URL de los archivos estáticos
+# Para producción, se usa el URL de los archivos estáticos de Whitenoise
 STATIC_URL = '/staticfiles/' if IS_DEPLOYED else '/static/'
 
 # Directorios adicionales donde buscar archivos estáticos
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'app_1', 'static'),
-]
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'proyecto/static'),
+    os.path.join(BASE_DIR, 'app_1', 'static', 'app_1'),
+)
 
 LOGIN_URL = '/signin'
 
@@ -214,11 +219,6 @@ LOGIN_URL = '/signin'
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 """
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'proyecto/static'),
-    os.path.join(BASE_DIR, 'app_1', 'static', 'app_1'),
-)
 
 # Configuración para almacenar archivos multimedia en el sistema de archivos (S3)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -231,6 +231,11 @@ else:
     
 # Se define el nombre de la carpeta de archivos públicos
 PUBLIC_MEDIA = 'publico'
+
+# Configuración de autenticación
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
 
 # Configuración de Email
 # https://docs.djangoproject.com/en/5.2/topics/email/
@@ -253,28 +258,25 @@ PUBLIC_MEDIA = 'publico'
 # EMAIL_HOST_PASSWORD = tu-contraseña-de-aplicación-de-google # Contraseña de aplicación de Gmail
 # DEFAULT_FROM_EMAIL = tu-email@gmail.com # Email de remitente
 
-# Si IS_DEPLOYED es True, se usa el backend de SMTP - Gmail
-# Si IS_DEPLOYED es False, se usa el backend de Consola
+# Si IS_DEPLOYED es True, se usa el backend de SMTP - Gmail (emails reales con HTML)
+# Si IS_DEPLOYED es False, se usa el backend de Consola (emails en texto plano en terminal)
 
 if IS_DEPLOYED:
-    EMAIL_BACKEND = os.getenv(
-        'EMAIL_BACKEND',
-        'django.core.mail.backends.smtp.EmailBackend'  # Producción (SMTP - Gmail)
-    )
+    # Producción: Enviar emails reales por SMTP
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 else:
-    EMAIL_BACKEND = os.getenv(
-        'EMAIL_BACKEND',    
-        'django.core.mail.backends.console.EmailBackend' # Desarrollo (Consola)
-    )
-
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
-
-# Configuración de autenticación
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_URL = '/login/'
+    # Desarrollo: Mostrar emails en la consola/terminal
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    # En desarrollo no se necesitan credenciales SMTP
+    EMAIL_HOST = 'localhost'
+    EMAIL_PORT = 25
+    EMAIL_USE_TLS = False
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    DEFAULT_FROM_EMAIL = 'noreply@proyecto-dev.local'
