@@ -17,13 +17,17 @@ Variables de entorno requeridas:
 import os
 import sys
 import django
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+load_dotenv()
 
 # Agregar el directorio del proyecto al path de Python
 project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
 
 # Configurar el entorno de Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proyecto.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f"{os.environ.get('PROJECT_NAME', 'proyecto')}.settings")
 
 # Inicializar Django
 django.setup()
