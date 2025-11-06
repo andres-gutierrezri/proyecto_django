@@ -211,6 +211,11 @@ database.txt
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
 
 # Ignore files for claude.ai/code
 .claude/
