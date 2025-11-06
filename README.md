@@ -196,22 +196,22 @@ HOSTING_URL=https://tu-dominio.com
 # PostgreSQL (recomendado)
 POSTGRESQL_DB_NAME=nombre_bd
 POSTGRESQL_DB_USER=usuario
-POSTGRESQL_DB_PASSWORD=contraseña
+POSTGRESQL_DB_PASSWORD=********
 POSTGRESQL_DB_HOST=localhost
 POSTGRESQL_DB_PORT=5432
-POSTGRESQL_DATABASE_URL=postgres://user:pass@host:port/dbname  # Producción
+POSTGRESQL_DATABASE_URL=postgres://user:****@host:port/dbname  # Producción
 
 # MySQL (alternativo)
 MYSQL_DB_NAME=nombre_bd
 MYSQL_DB_USER=root
-MYSQL_DB_PASSWORD=contraseña
+MYSQL_DB_PASSWORD=********
 MYSQL_DB_HOST=localhost
 MYSQL_DB_PORT=3306
-MYSQL_DATABASE_URL=mysql://user:pass@host:port/dbname  # Producción
+MYSQL_DATABASE_URL=mysql://user:****@host:port/dbname  # Producción
 
 # AWS S3 (opcional, para archivos media en producción)
 AWS_ACCESS_KEY_ID=tu-access-key
-AWS_SECRET_ACCESS_KEY=tu-secret-key
+AWS_SECRET_ACCESS_KEY=********
 AWS_STORAGE_BUCKET_NAME=tu-bucket
 AWS_S3_REGION_NAME=us-east-1
 
@@ -222,7 +222,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=tu-email@gmail.com
-EMAIL_HOST_PASSWORD=tu-contraseña-de-aplicación-de-google
+EMAIL_HOST_PASSWORD=********
 DEFAULT_FROM_EMAIL=tu-email@gmail.com
 ```
 
@@ -320,7 +320,7 @@ El proyecto soporta PostgreSQL (recomendado) y MySQL. Configure las variables de
 DATABASE_SELECTOR=postgresql
 POSTGRESQL_DB_NAME=mi_base_datos
 POSTGRESQL_DB_USER=mi_usuario
-POSTGRESQL_DB_PASSWORD=mi_contraseña
+POSTGRESQL_DB_PASSWORD=********
 POSTGRESQL_DB_HOST=localhost
 POSTGRESQL_DB_PORT=5432
 ```
@@ -330,7 +330,7 @@ POSTGRESQL_DB_PORT=5432
 DATABASE_SELECTOR=mysql
 MYSQL_DB_NAME=mi_base_datos
 MYSQL_DB_USER=root
-MYSQL_DB_PASSWORD=mi_contraseña
+MYSQL_DB_PASSWORD=********
 MYSQL_DB_HOST=localhost
 MYSQL_DB_PORT=3306
 ```
@@ -491,7 +491,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=tu-email@gmail.com
-EMAIL_HOST_PASSWORD=tu-contraseña-de-aplicación-de-google
+EMAIL_HOST_PASSWORD=********
 DEFAULT_FROM_EMAIL=tu-email@gmail.com
 ```
 
@@ -785,7 +785,7 @@ Railway utiliza Nixpacks para construir y desplegar la aplicación automáticame
 
    # Opcional: AWS S3 para archivos media
    AWS_ACCESS_KEY_ID=tu-access-key
-   AWS_SECRET_ACCESS_KEY=tu-secret-key
+   AWS_SECRET_ACCESS_KEY=********
    AWS_STORAGE_BUCKET_NAME=tu-bucket
    AWS_S3_REGION_NAME=us-east-1
    ```
@@ -817,7 +817,7 @@ En la plataforma de despliegue, configure:
 IS_DEPLOYED=True
 SECRET_KEY=clave-secreta-segura-generada
 DATABASE_SELECTOR=postgresql
-POSTGRESQL_DATABASE_URL=postgres://user:pass@host:port/dbname
+POSTGRESQL_DATABASE_URL=postgres://user:****@host:port/dbname
 HOSTING_DOMAIN=tu-dominio.com
 HOSTING_URL=https://tu-dominio.com
 
