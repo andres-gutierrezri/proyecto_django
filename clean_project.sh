@@ -32,8 +32,9 @@ show_menu() {
     echo -e "${YELLOW}1)${NC} Eliminar migraciones"
     echo -e "${YELLOW}2)${NC} Eliminar y recrear base de datos MySQL"
     echo -e "${YELLOW}3)${NC} Eliminar entorno virtual de Python"
-    echo -e "${YELLOW}4)${NC} Ejecutar todas las tareas (1 + 2 + 3)"
-    echo -e "${YELLOW}5)${NC} Salir"
+    echo -e "${YELLOW}4)${NC} Eliminar carpeta staticfiles"
+    echo -e "${YELLOW}5)${NC} Ejecutar todas las tareas (1 + 2 + 3 + 4)"
+    echo -e "${YELLOW}6)${NC} Salir"
     echo ""
 }
 
@@ -226,6 +227,34 @@ delete_virtualenv() {
 }
 
 # ================================================================
+# FUNCIÓN: Eliminar carpeta staticfiles
+# ================================================================
+delete_staticfiles() {
+    echo ""
+    echo -e "${MAGENTA}════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${MAGENTA}TAREA 4: ELIMINAR CARPETA STATICFILES${NC}"
+    echo -e "${MAGENTA}════════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    
+    if [ ! -d "staticfiles" ]; then
+        echo -e "${YELLOW}⚠️  La carpeta staticfiles no existe${NC}"
+        return 0
+    fi
+    
+    echo -e "${YELLOW}🗑️  Eliminando carpeta staticfiles...${NC}"
+    
+    # Eliminar el directorio staticfiles
+    rm -rf staticfiles
+    
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✅ Carpeta staticfiles eliminada exitosamente${NC}"
+    else
+        echo -e "${RED}❌ Error al eliminar la carpeta staticfiles${NC}"
+        return 1
+    fi
+}
+
+# ================================================================
 # FUNCIÓN: Mostrar instrucciones finales
 # ================================================================
 show_final_instructions() {
@@ -248,6 +277,9 @@ show_final_instructions() {
     echo -e "${BLUE}3. Crear el superusuario:${NC}"
     echo -e "   ${YELLOW}python create_default_superuser.py${NC}"
     echo ""
+    echo -e "${BLUE}4. Recolectar archivos estáticos:${NC}"
+    echo -e "   ${YELLOW}python manage.py collectstatic --noinput${NC}"
+    echo ""
     echo -e "${CYAN}════════════════════════════════════════════════════════════════${NC}"
 }
 
@@ -257,7 +289,7 @@ show_final_instructions() {
 main() {
     while true; do
         show_menu
-        read -p "$(echo -e ${YELLOW}Seleccione una opción \[1-5\]: ${NC})" opcion
+        read -p "$(echo -e ${YELLOW}Seleccione una opción \[1-6\]: ${NC})" opcion
         
         case $opcion in
             1)
@@ -288,10 +320,22 @@ main() {
                 ;;
             4)
                 echo ""
+                echo -e "${RED}⚠️  ADVERTENCIA: Esta acción eliminará la carpeta staticfiles.${NC}"
+                echo ""
+                read -p "$(echo -e ${YELLOW}¿Desea continuar? \(s/n\): ${NC})" confirmacion
+                if [ "$confirmacion" = "s" ] || [ "$confirmacion" = "S" ]; then
+                    delete_staticfiles
+                else
+                    echo -e "${YELLOW}❌ Operación cancelada.${NC}"
+                fi
+                ;;
+            5)
+                echo ""
                 echo -e "${RED}⚠️  ADVERTENCIA: Esta acción realizará las siguientes tareas:${NC}"
                 echo -e "${RED}   1. Eliminar todas las migraciones${NC}"
                 echo -e "${RED}   2. Eliminar y recrear la base de datos${NC}"
                 echo -e "${RED}   3. Eliminar el entorno virtual${NC}"
+                echo -e "${RED}   4. Eliminar carpeta staticfiles${NC}"
                 echo -e "${RED}   TODOS los datos se perderán de forma permanente.${NC}"
                 echo ""
                 read -p "$(echo -e ${YELLOW}¿Desea continuar? \(s/n\): ${NC})" confirmacion
@@ -299,19 +343,20 @@ main() {
                     delete_migrations
                     recreate_database
                     delete_virtualenv
+                    delete_staticfiles
                     show_final_instructions
                 else
                     echo -e "${YELLOW}❌ Operación cancelada.${NC}"
                 fi
                 ;;
-            5)
+            6)
                 echo ""
                 echo -e "${GREEN}👋 ¡Hasta luego!${NC}"
                 echo ""
                 exit 0
                 ;;
             *)
-                echo -e "${RED}❌ Opción inválida. Por favor seleccione una opción del 1 al 5.${NC}"
+                echo -e "${RED}❌ Opción inválida. Por favor seleccione una opción del 1 al 6.${NC}"
                 ;;
         esac
         

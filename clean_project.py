@@ -53,8 +53,9 @@ def print_menu():
     print(f"{Colors.YELLOW}1){Colors.NC} Eliminar migraciones")
     print(f"{Colors.YELLOW}2){Colors.NC} Eliminar y recrear base de datos MySQL")
     print(f"{Colors.YELLOW}3){Colors.NC} Eliminar entorno virtual de Python")
-    print(f"{Colors.YELLOW}4){Colors.NC} Ejecutar todas las tareas (1 + 2 + 3)")
-    print(f"{Colors.YELLOW}5){Colors.NC} Salir")
+    print(f"{Colors.YELLOW}4){Colors.NC} Eliminar carpeta staticfiles")
+    print(f"{Colors.YELLOW}5){Colors.NC} Ejecutar todas las tareas (1 + 2 + 3 + 4)")
+    print(f"{Colors.YELLOW}6){Colors.NC} Salir")
     print()
 
 
@@ -298,6 +299,32 @@ def delete_virtualenv():
         return False
 
 
+def delete_staticfiles():
+    """
+    Elimina la carpeta staticfiles.
+    
+    Returns:
+        bool: True si se ejecutó correctamente
+    """
+    print_header("TAREA 4: ELIMINAR CARPETA STATICFILES")
+    
+    staticfiles_path = Path('staticfiles')
+    
+    if not staticfiles_path.exists():
+        print(f"{Colors.YELLOW}⚠️  La carpeta staticfiles no existe{Colors.NC}")
+        return True
+    
+    print(f"{Colors.YELLOW}🗑️  Eliminando carpeta staticfiles...{Colors.NC}")
+    
+    try:
+        shutil.rmtree(staticfiles_path)
+        print(f"{Colors.GREEN}✅ Carpeta staticfiles eliminada exitosamente{Colors.NC}")
+        return True
+    except Exception as e:
+        print(f"{Colors.RED}❌ Error al eliminar la carpeta staticfiles: {e}{Colors.NC}")
+        return False
+
+
 def show_final_instructions():
     """Muestra las instrucciones finales."""
     print()
@@ -319,6 +346,9 @@ def show_final_instructions():
     print()
     print(f"{Colors.BLUE}3. Crear el superusuario:{Colors.NC}")
     print(f"   {Colors.YELLOW}python create_default_superuser.py{Colors.NC}")
+    print()
+    print(f"{Colors.BLUE}4. Recolectar archivos estáticos:{Colors.NC}")
+    print(f"   {Colors.YELLOW}python manage.py collectstatic --noinput{Colors.NC}")
     print()
     print(f"{Colors.CYAN}{'=' * 64}{Colors.NC}")
 
@@ -346,7 +376,7 @@ def main():
         print_menu()
         
         try:
-            opcion = input(f"{Colors.YELLOW}Seleccione una opción [1-5]: {Colors.NC}").strip()
+            opcion = input(f"{Colors.YELLOW}Seleccione una opción [1-6]: {Colors.NC}").strip()
             
             if opcion == '1':
                 delete_migrations()
@@ -370,27 +400,37 @@ def main():
                     
             elif opcion == '4':
                 if confirm_action(
+                    f"{Colors.RED}⚠️  ADVERTENCIA: Esta acción eliminará la carpeta staticfiles.{Colors.NC}"
+                ):
+                    delete_staticfiles()
+                else:
+                    print(f"{Colors.YELLOW}❌ Operación cancelada.{Colors.NC}")
+                    
+            elif opcion == '5':
+                if confirm_action(
                     f"{Colors.RED}⚠️  ADVERTENCIA: Esta acción realizará las siguientes tareas:\n"
                     f"   1. Eliminar todas las migraciones\n"
                     f"   2. Eliminar y recrear la base de datos\n"
                     f"   3. Eliminar el entorno virtual\n"
+                    f"   4. Eliminar carpeta staticfiles\n"
                     f"   TODOS los datos se perderán de forma permanente.{Colors.NC}"
                 ):
                     delete_migrations()
                     recreate_database()
                     delete_virtualenv()
+                    delete_staticfiles()
                     show_final_instructions()
                 else:
                     print(f"{Colors.YELLOW}❌ Operación cancelada.{Colors.NC}")
                     
-            elif opcion == '5':
+            elif opcion == '6':
                 print()
                 print(f"{Colors.GREEN}👋 ¡Hasta luego!{Colors.NC}")
                 print()
                 return 0
                 
             else:
-                print(f"{Colors.RED}❌ Opción inválida. Por favor seleccione una opción del 1 al 5.{Colors.NC}")
+                print(f"{Colors.RED}❌ Opción inválida. Por favor seleccione una opción del 1 al 6.{Colors.NC}")
             
             print()
             input(f"{Colors.CYAN}Presione ENTER para continuar...{Colors.NC}")

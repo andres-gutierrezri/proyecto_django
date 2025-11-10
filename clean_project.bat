@@ -26,17 +26,19 @@ echo.
 echo [93m1)[0m Eliminar migraciones
 echo [93m2)[0m Eliminar y recrear base de datos MySQL
 echo [93m3)[0m Eliminar entorno virtual de Python
-echo [93m4)[0m Ejecutar todas las tareas (1 + 2 + 3)
-echo [93m5)[0m Salir
+echo [93m4)[0m Eliminar carpeta staticfiles
+echo [93m5)[0m Ejecutar todas las tareas (1 + 2 + 3 + 4)
+echo [93m6)[0m Salir
 echo.
-set /p opcion="[93mSeleccione una opcion [1-5]: [0m"
+set /p opcion="[93mSeleccione una opcion [1-6]: [0m"
 
 if "%opcion%"=="1" goto delete_migrations
 if "%opcion%"=="2" goto confirm_database
 if "%opcion%"=="3" goto confirm_virtualenv
-if "%opcion%"=="4" goto confirm_all
-if "%opcion%"=="5" goto salir
-echo [91m❌ Opcion invalida. Por favor seleccione una opcion del 1 al 5.[0m
+if "%opcion%"=="4" goto confirm_staticfiles
+if "%opcion%"=="5" goto confirm_all
+if "%opcion%"=="6" goto salir
+echo [91m❌ Opcion invalida. Por favor seleccione una opcion del 1 al 6.[0m
 pause
 goto inicio
 
@@ -236,7 +238,7 @@ if %errorlevel% equ 0 (
 echo.
 echo [92m✅ Base de datos '%MYSQL_DB_NAME%' recreada exitosamente.[0m
 
-if "%opcion%"=="4" goto delete_virtualenv_no_confirm
+if "%opcion%"=="5" goto delete_virtualenv_no_confirm
 echo.
 pause
 goto inicio
@@ -280,7 +282,51 @@ if %errorlevel% equ 0 (
 )
 
 :end_virtualenv
-if "%opcion%"=="4" goto show_instructions
+if "%opcion%"=="5" goto delete_staticfiles_no_confirm
+echo.
+pause
+goto inicio
+
+REM ================================================================
+REM CONFIRMACIÓN: Eliminar carpeta staticfiles
+REM ================================================================
+:confirm_staticfiles
+echo.
+echo [91m⚠️  ADVERTENCIA: Esta accion eliminara la carpeta staticfiles.[0m
+echo.
+set /p confirmacion="[93m¿Desea continuar? (s/n): [0m"
+if /i not "%confirmacion%"=="s" (
+    echo [93m❌ Operacion cancelada.[0m
+    pause
+    goto inicio
+)
+
+:delete_staticfiles_no_confirm
+echo.
+echo [95m================================================================[0m
+echo [95mTAREA 4: ELIMINAR CARPETA STATICFILES[0m
+echo [95m================================================================[0m
+echo.
+
+if not exist "staticfiles" (
+    echo [93m⚠️  La carpeta staticfiles no existe[0m
+    goto end_staticfiles
+)
+
+echo [93m🗑️  Eliminando carpeta staticfiles...[0m
+
+rd /s /q staticfiles
+
+if %errorlevel% equ 0 (
+    echo [92m✅ Carpeta staticfiles eliminada exitosamente[0m
+) else (
+    echo [91m❌ Error al eliminar la carpeta staticfiles[0m
+    pause
+    goto inicio
+)
+
+:end_staticfiles
+if "%opcion%"=="5" goto show_instructions
 echo.
 pause
 goto inicio
@@ -294,6 +340,7 @@ echo [91m⚠️  ADVERTENCIA: Esta accion realizara las siguientes tareas:[0m
 echo [91m   1. Eliminar todas las migraciones[0m
 echo [91m   2. Eliminar y recrear la base de datos[0m
 echo [91m   3. Eliminar el entorno virtual[0m
+echo [91m   4. Eliminar carpeta staticfiles[0m
 echo [91m   TODOS los datos se perderan de forma permanente.[0m
 echo.
 set /p confirmacion="[93m¿Desea continuar? (s/n): [0m"
@@ -326,6 +373,9 @@ echo    [93mpython manage.py migrate[0m
 echo.
 echo [94m3. Crear el superusuario:[0m
 echo    [93mpython create_default_superuser.py[0m
+echo.
+echo [94m4. Recolectar archivos estaticos:[0m
+echo    [93mpython manage.py collectstatic --noinput[0m
 echo.
 echo [96m================================================================[0m
 echo.
