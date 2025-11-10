@@ -449,6 +449,149 @@ def verify_mysqldb_import(python_executable):
         
         return False
 
+def load_env_variables():
+    """
+    Carga las variables de entorno desde el archivo .env
+    
+    Returns:
+        dict: Diccionario con las variables de entorno o None si hay error
+    """
+    env_file = Path('.env')
+    
+    if not env_file.exists():
+        print(f"⚠️  No se encontró el archivo .env")
+        return None
+    
+    env_vars = {}
+    
+    with open(env_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            
+            # Ignorar líneas vacías y comentarios
+            if not line or line.startswith('#'):
+                continue
+            
+            # Separar clave y valor
+            if '=' in line:
+                key, value = line.split('=', 1)
+                # Eliminar comillas simples y dobles
+                value = value.strip().strip("'\"")
+                env_vars[key.strip()] = value
+    
+    return env_vars
+
+
+def create_mysql_database():
+    """
+    Verifica y crea la base de datos MySQL si no existe.
+    
+    Returns:
+        bool: True si la base de datos existe o fue creada exitosamente, False si falla
+    """
+    print("🔍 Verificando base de datos MySQL...")
+    
+    # Cargar variables de entorno
+    env_vars = load_env_variables()
+    
+    if not env_vars:
+        print("❌ ERROR CRÍTICO: No se pudo cargar el archivo .env")
+        print("   El archivo .env es necesario para la configuración de la base de datos.")
+        return False
+    
+    # Verificar si se está usando MySQL
+    database_selector = env_vars.get('DATABASE_SELECTOR', 'mysql')
+    if database_selector != 'mysql':
+        print(f"ℹ️  Base de datos configurada: {database_selector} (no es MySQL, saltando verificación)")
+        return True
+    
+    # Validar variables necesarias
+    required_vars = ['MYSQL_DB_NAME', 'MYSQL_DB_USER', 'MYSQL_DB_PASSWORD', 
+                     'MYSQL_DB_HOST', 'MYSQL_DB_PORT']
+    
+    missing_vars = [var for var in required_vars if var not in env_vars or not env_vars[var]]
+    
+    if missing_vars:
+        print(f"❌ ERROR CRÍTICO: Faltan variables de entorno de MySQL en .env: {', '.join(missing_vars)}")
+        print("   Todas las variables de MySQL son obligatorias para continuar.")
+        return False
+    
+    print(f"📊 Configuración de MySQL:")
+    print(f"   Base de datos: {env_vars['MYSQL_DB_NAME']}")
+    print(f"   Usuario: {env_vars['MYSQL_DB_USER']}")
+    print(f"   Host: {env_vars['MYSQL_DB_HOST']}")
+    print(f"   Puerto: {env_vars['MYSQL_DB_PORT']}")
+    
+    # Función auxiliar para ejecutar comandos MySQL
+    def execute_mysql(sql_command, capture_output=False):
+        cmd = [
+            'mysql',
+            f"-u{env_vars['MYSQL_DB_USER']}",
+            f"-p{env_vars['MYSQL_DB_PASSWORD']}",
+            f"-h{env_vars['MYSQL_DB_HOST']}",
+            f"-P{env_vars['MYSQL_DB_PORT']}",
+            '--default-character-set=utf8mb4',
+            '-e',
+            sql_command
+        ]
+        
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            if capture_output:
+                return result.stdout.strip()
+            return True
+        except subprocess.CalledProcessError as e:
+            if capture_output:
+                print(f"   Error en comando MySQL: {e.stderr}")
+            return False
+        except FileNotFoundError:
+            print("❌ ERROR: MySQL no está instalado o no se encuentra en el PATH")
+            return None
+    
+    # Verificar conexión a MySQL primero
+    print("🔌 Verificando conexión a MySQL...")
+    test_connection = execute_mysql("SELECT 1;", capture_output=True)
+    
+    if test_connection is None:
+        print("❌ ERROR CRÍTICO: MySQL no está disponible en el sistema")
+        print("   Por favor, instala MySQL o verifica que esté en el PATH")
+        return False
+    
+    if not test_connection:
+        print("❌ ERROR CRÍTICO: No se pudo conectar a MySQL")
+        print("   Verifica las credenciales en el archivo .env:")
+        print(f"   - Usuario: {env_vars['MYSQL_DB_USER']}")
+        print(f"   - Host: {env_vars['MYSQL_DB_HOST']}")
+        print(f"   - Puerto: {env_vars['MYSQL_DB_PORT']}")
+        return False
+    
+    print("✅ Conexión a MySQL exitosa")
+    
+    # Verificar si la base de datos existe
+    check_sql = f"SHOW DATABASES LIKE '{env_vars['MYSQL_DB_NAME']}';"
+    db_exists = execute_mysql(check_sql, capture_output=True)
+    
+    if db_exists and env_vars['MYSQL_DB_NAME'] in db_exists:
+        print(f"✅ Base de datos '{env_vars['MYSQL_DB_NAME']}' ya existe")
+        return True
+    else:
+        print(f"⚠️  Base de datos '{env_vars['MYSQL_DB_NAME']}' no existe")
+        print(f"🔨 Creando base de datos '{env_vars['MYSQL_DB_NAME']}'...")
+        
+        # Crear base de datos
+        create_sql = f"CREATE DATABASE `{env_vars['MYSQL_DB_NAME']}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+        
+        if execute_mysql(create_sql):
+            print(f"✅ Base de datos '{env_vars['MYSQL_DB_NAME']}' creada exitosamente")
+            return True
+        else:
+            print(f"❌ ERROR CRÍTICO: No se pudo crear la base de datos '{env_vars['MYSQL_DB_NAME']}'")
+            print("   Verifica que el usuario tenga permisos para crear bases de datos")
+            print("   O crea la base de datos manualmente con:")
+            print(f"   CREATE DATABASE `{env_vars['MYSQL_DB_NAME']}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+            return False
+
+
 def create_default_superuser(python_executable):
     """Crea el superusuario por defecto si no existe"""
     print("👤 Creando superusuario por defecto (si no existe)...")
@@ -629,6 +772,12 @@ def main():
         
         # Paso 3.5: Listar paquetes instalados
         list_installed_packages(python_executable)
+        
+        # Paso 3.7: Verificar y crear base de datos MySQL
+        if not create_mysql_database():
+            print("\n⚠️  Advertencia: No se pudo verificar/crear la base de datos MySQL")
+            print("   El proyecto puede fallar si la base de datos no existe")
+            print("   Continuando de todos modos...")
         
         # Paso 4: Ejecutar migraciones
         run_migrations(python_executable)
