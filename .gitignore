@@ -12,9 +12,6 @@ db.sqlite3
 */migrations/*
 !*/migrations/__init__.py
 
-# Ignore ".log"
-eva.log
-
 # Ignore ".git"
 ._.git
 
@@ -194,6 +191,9 @@ cython_debug/
 # Ignore Visual Studio Code Settings (.vscode)
 .vscode/
 
+# Ignore Cursor files
+.cursor/
+
 # Ignore password files
 users.txt
 database.txt
@@ -217,6 +217,10 @@ Icon?
 .Spotlight-V100
 .Trashes
 
+# Ingnore files markdown (.md) except README.md
+*.md
+!README.md
+
 # Ignore files for claude.ai/code
 .claude/
 CLAUDE.md
@@ -230,12 +234,15 @@ AGENTS.md
 .warp/
 WARP.md
 
-# Ignore files for cursor.ai
-.cursor/
+# Ignore log files
+*.log
+logs/
 
-# ignore files for markdown IA resume generators
-DEBUG_INSTRUCTIONS.md
-RESUME_DATA.md
-RESUME_OUTPUT.md
-RESUME_TEMPLATES.md
-RESUMEN_CAMBIOS.md
+# Ignore temp files
+*.tmp
+temp/
+tmp/
+
+# Ignore cache files
+*.cache
+cache/
