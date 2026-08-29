@@ -206,7 +206,182 @@ if %errorlevel% neq 0 (
 )
 echo.
 
-echo 📁 Recolectando archivos estáticos...
+echo 🔍 Verificando base de datos MySQL...
+
+REM Verificar si existe el archivo .env
+if not exist ".env" (
+    echo ❌ ERROR CRÍTICO: No se encontró el archivo .env
+    echo    El archivo .env es necesario para la configuración de la base de datos.
+    echo.
+    set /p "continue_response=   ¿Deseas continuar sin verificar la base de datos? (NO RECOMENDADO) [s/N]: "
+    if /i not "!continue_response!"=="s" (
+        echo.
+        echo 🛑 Proceso detenido por el usuario
+        echo    Por favor, crea el archivo .env con la configuración necesaria.
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ⚠️  ADVERTENCIA: Continuando sin verificación de base de datos...
+    goto :skip_db_check
+)
+
+REM Leer variables del archivo .env
+set DATABASE_SELECTOR=
+set MYSQL_DB_NAME=
+set MYSQL_DB_USER=
+set MYSQL_DB_PASSWORD=
+set MYSQL_DB_HOST=
+set MYSQL_DB_PORT=
+
+for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
+    set "line=%%a"
+    set "value=%%b"
+    
+    REM Ignorar líneas en blanco y comentarios
+    if not "!line!"=="" (
+        echo !line! | findstr /v /r "^#" >nul
+        if not errorlevel 1 (
+            REM Eliminar comillas simples, dobles y caracteres de nueva línea
+            set "value=!value:'=!"
+            set "value=!value:"=!"
+            
+            REM Eliminar espacios y caracteres de control al final
+            for /f "tokens=*" %%x in ("!value!") do set "value=%%x"
+            
+            REM Asignar variables necesarias
+            if "%%a"=="DATABASE_SELECTOR" set "DATABASE_SELECTOR=!value!"
+            if "%%a"=="MYSQL_DB_NAME" set "MYSQL_DB_NAME=!value!"
+            if "%%a"=="MYSQL_DB_USER" set "MYSQL_DB_USER=!value!"
+            if "%%a"=="MYSQL_DB_PASSWORD" set "MYSQL_DB_PASSWORD=!value!"
+            if "%%a"=="MYSQL_DB_HOST" set "MYSQL_DB_HOST=!value!"
+            if "%%a"=="MYSQL_DB_PORT" set "MYSQL_DB_PORT=!value!"
+        )
+    )
+)
+
+REM Verificar si se está usando MySQL
+if "%DATABASE_SELECTOR%"=="" set DATABASE_SELECTOR=mysql
+
+if not "%DATABASE_SELECTOR%"=="mysql" (
+    echo ℹ️  Base de datos configurada: %DATABASE_SELECTOR% ^(no es MySQL, saltando verificación^)
+    goto :skip_db_check
+)
+
+REM Validar que las variables necesarias están definidas
+if "%MYSQL_DB_NAME%"=="" (
+    echo ❌ ERROR CRÍTICO: Faltan variables de entorno de MySQL en .env
+    echo    Variables requeridas: MYSQL_DB_NAME, MYSQL_DB_USER, MYSQL_DB_PASSWORD, MYSQL_DB_HOST, MYSQL_DB_PORT
+    echo.
+    set /p "continue_response=   ¿Deseas continuar sin verificar la base de datos? (NO RECOMENDADO) [s/N]: "
+    if /i not "!continue_response!"=="s" (
+        echo.
+        echo 🛑 Proceso detenido por el usuario
+        echo    Por favor, completa las variables de MySQL en el archivo .env
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ⚠️  ADVERTENCIA: Continuando sin verificación de base de datos...
+    goto :skip_db_check
+)
+
+echo 📊 Configuración de MySQL:
+echo    Base de datos: %MYSQL_DB_NAME%
+echo    Usuario: %MYSQL_DB_USER%
+echo    Host: %MYSQL_DB_HOST%
+echo    Puerto: %MYSQL_DB_PORT%
+
+REM Verificar si MySQL está disponible
+where mysql >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ ERROR CRÍTICO: MySQL no está instalado o no está en el PATH
+    echo    Por favor, instala MySQL o agrégalo al PATH
+    echo.
+    set /p "continue_response=   ¿Deseas continuar de todos modos? (NO RECOMENDADO) [s/N]: "
+    if /i not "!continue_response!"=="s" (
+        echo.
+        echo 🛑 Proceso detenido por el usuario
+        echo    Instala MySQL desde: https://dev.mysql.com/downloads/mysql/
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ⚠️  ADVERTENCIA: Continuando sin verificación de base de datos...
+    goto :skip_db_check
+)
+
+REM Verificar conexión a MySQL primero
+echo 🔌 Verificando conexión a MySQL...
+mysql -u"%MYSQL_DB_USER%" -p"%MYSQL_DB_PASSWORD%" -h"%MYSQL_DB_HOST%" -P"%MYSQL_DB_PORT%" --default-character-set=utf8mb4 -e "SELECT 1;" 2>nul
+
+if %errorlevel% neq 0 (
+    echo ❌ ERROR CRÍTICO: No se pudo conectar a MySQL
+    echo    Verifica las credenciales en el archivo .env:
+    echo    - Usuario: %MYSQL_DB_USER%
+    echo    - Host: %MYSQL_DB_HOST%
+    echo    - Puerto: %MYSQL_DB_PORT%
+    echo.
+    set /p "continue_response=   ¿Deseas continuar de todos modos? (NO RECOMENDADO) [s/N]: "
+    if /i not "!continue_response!"=="s" (
+        echo.
+        echo 🛑 Proceso detenido por el usuario
+        echo    Por favor, verifica la configuración de MySQL.
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ⚠️  ADVERTENCIA: Continuando sin verificación de base de datos...
+    goto :skip_db_check
+)
+echo ✅ Conexión a MySQL exitosa
+
+REM Verificar si la base de datos existe
+mysql -u"%MYSQL_DB_USER%" -p"%MYSQL_DB_PASSWORD%" -h"%MYSQL_DB_HOST%" -P"%MYSQL_DB_PORT%" --default-character-set=utf8mb4 -e "SHOW DATABASES LIKE '%MYSQL_DB_NAME%';" 2>nul | findstr /v "Database" > temp_db_check.txt
+
+set DB_EXISTS=0
+for /f %%a in (temp_db_check.txt) do set DB_EXISTS=1
+del temp_db_check.txt 2>nul
+
+if %DB_EXISTS% equ 1 (
+    echo ✅ Base de datos '%MYSQL_DB_NAME%' ya existe
+) else (
+    echo ⚠️  Base de datos '%MYSQL_DB_NAME%' no existe
+    echo 🔨 Creando base de datos '%MYSQL_DB_NAME%'...
+    
+    REM Crear base de datos
+    mysql -u"%MYSQL_DB_USER%" -p"%MYSQL_DB_PASSWORD%" -h"%MYSQL_DB_HOST%" -P"%MYSQL_DB_PORT%" --default-character-set=utf8mb4 -e "CREATE DATABASE `%MYSQL_DB_NAME%` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>nul
+    
+    if %errorlevel% equ 0 (
+        echo ✅ Base de datos '%MYSQL_DB_NAME%' creada exitosamente
+    ) else (
+        echo.
+        echo ======================================================================
+        echo ❌ ERROR CRÍTICO: No se pudo crear la base de datos '%MYSQL_DB_NAME%'
+        echo ======================================================================
+        echo.
+        echo 💡 Soluciones posibles:
+        echo    1. Verifica que el usuario tenga permisos CREATE DATABASE
+        echo    2. Crea la base de datos manualmente con:
+        echo       CREATE DATABASE `%MYSQL_DB_NAME%` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        echo.
+        set /p "continue_response=   ¿Deseas continuar de todos modos? (NO RECOMENDADO) [s/N]: "
+        if /i not "!continue_response!"=="s" (
+            echo.
+            echo 🛑 Proceso detenido por el usuario
+            echo    Por favor, soluciona los problemas de la base de datos y vuelve a intentar.
+            pause
+            exit /b 1
+        )
+        echo.
+        echo ⚠️  ADVERTENCIA: Continuando sin base de datos verificada...
+        echo    Las migraciones probablemente fallarán.
+    )
+)
+
+:skip_db_check
+echo.
+echo �📁 Recolectando archivos estáticos...
 .venv\Scripts\python.exe manage.py collectstatic --noinput
 if %errorlevel% neq 0 (
     echo ⚠️  Advertencia al recolectar archivos estáticos ^(puede ser normal si no está configurado^)
@@ -228,6 +403,12 @@ if %errorlevel% neq 0 (
 )
 
 echo ✅ Migraciones completadas
+
+echo 👤 Creando superusuario por defecto ^(si no existe^)...
+.venv\Scripts\python.exe create_default_superuser.py
+if %errorlevel% neq 0 (
+    echo ⚠️  Advertencia al crear superusuario ^(puede ser normal si ya existe^)
+)
 
 echo 🔍 Verificando importación de MySQLdb...
 .venv\Scripts\python.exe -c "import MySQLdb; print('MySQLdb import successful')" 2>nul

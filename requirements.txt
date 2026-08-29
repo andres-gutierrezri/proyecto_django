@@ -15,9 +15,9 @@
 asgiref==3.10.0
 
 # Django Framework - Framework web principal del proyecto
-# Versión 5.2.3 - versión estable y moderna con soporte completo
+# Versión 5.2.7 - versión estable y moderna con soporte completo
 # Incluye: ORM, sistema de templates, autenticación, admin panel, etc.
-Django==5.2.3
+Django==5.2.7
 
 # SQL Parse - Parser y formateador de consultas SQL
 # Utilizado por Django para parsear, formatear y validar consultas SQL
@@ -123,6 +123,12 @@ python-dotenv==1.0.1
 # Proporciona parsers y utilidades adicionales para datetime
 # Maneja zonas horarias, deltas relativos, recurrencias
 python-dateutil==2.9.0.post0
+
+# pytz - Biblioteca de zonas horarias para Python
+# Implementación de la base de datos de zonas horarias IANA/Olson
+# Necesaria para conversión y manejo de zonas horarias en Django
+# Usada por los filtros personalizados de timezone
+pytz==2024.2
 
 # TOML - Parser para archivos TOML (Tom's Obvious Minimal Language)
 # Formato de configuración moderno usado por pyproject.toml

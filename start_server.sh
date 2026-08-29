@@ -224,7 +224,162 @@ else
 fi
 echo ""
 
-echo "📁 Recolectando archivos estáticos..."
+echo "🔍 Verificando base de datos MySQL..."
+
+# Verificar si existe el archivo .env
+if [ ! -f ".env" ]; then
+    echo "❌ ERROR CRÍTICO: No se encontró el archivo .env"
+    echo "   El archivo .env es necesario para la configuración de la base de datos."
+    echo ""
+    read -p "   ¿Deseas continuar sin verificar la base de datos? (NO RECOMENDADO) [s/N]: " continue_response
+    if [ "$continue_response" != "s" ] && [ "$continue_response" != "S" ]; then
+        echo ""
+        echo "🛑 Proceso detenido por el usuario"
+        echo "   Por favor, crea el archivo .env con la configuración necesaria."
+        exit 1
+    fi
+    echo ""
+    echo "⚠️  ADVERTENCIA: Continuando sin verificación de base de datos..."
+else
+    # Leer variables del archivo .env
+    DATABASE_SELECTOR=""
+    MYSQL_DB_NAME=""
+    MYSQL_DB_USER=""
+    MYSQL_DB_PASSWORD=""
+    MYSQL_DB_HOST=""
+    MYSQL_DB_PORT=""
+    
+    while IFS='=' read -r key value || [ -n "$key" ]; do
+        # Ignorar líneas vacías y comentarios
+        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+        
+        # Eliminar espacios en blanco, comillas y caracteres de nueva línea
+        key=$(echo "$key" | xargs | tr -d '\r\n')
+        value=$(echo "$value" | xargs | tr -d "'\"\r\n")
+        
+        # Asignar variables necesarias
+        case "$key" in
+            DATABASE_SELECTOR) DATABASE_SELECTOR="$value" ;;
+            MYSQL_DB_NAME) MYSQL_DB_NAME="$value" ;;
+            MYSQL_DB_USER) MYSQL_DB_USER="$value" ;;
+            MYSQL_DB_PASSWORD) MYSQL_DB_PASSWORD="$value" ;;
+            MYSQL_DB_HOST) MYSQL_DB_HOST="$value" ;;
+            MYSQL_DB_PORT) MYSQL_DB_PORT="$value" ;;
+        esac
+    done < .env
+    
+    # Verificar si se está usando MySQL
+    if [ -z "$DATABASE_SELECTOR" ]; then
+        DATABASE_SELECTOR="mysql"
+    fi
+    
+    if [ "$DATABASE_SELECTOR" != "mysql" ]; then
+        echo "ℹ️  Base de datos configurada: $DATABASE_SELECTOR (no es MySQL, saltando verificación)"
+    else
+        # Validar que las variables necesarias están definidas
+        if [ -z "$MYSQL_DB_NAME" ] || [ -z "$MYSQL_DB_USER" ] || [ -z "$MYSQL_DB_PASSWORD" ] || [ -z "$MYSQL_DB_HOST" ] || [ -z "$MYSQL_DB_PORT" ]; then
+            echo "❌ ERROR CRÍTICO: Faltan variables de entorno de MySQL en .env"
+            echo "   Variables requeridas: MYSQL_DB_NAME, MYSQL_DB_USER, MYSQL_DB_PASSWORD, MYSQL_DB_HOST, MYSQL_DB_PORT"
+            echo ""
+            read -p "   ¿Deseas continuar sin verificar la base de datos? (NO RECOMENDADO) [s/N]: " continue_response
+            if [ "$continue_response" != "s" ] && [ "$continue_response" != "S" ]; then
+                echo ""
+                echo "🛑 Proceso detenido por el usuario"
+                echo "   Por favor, completa las variables de MySQL en el archivo .env"
+                exit 1
+            fi
+            echo ""
+            echo "⚠️  ADVERTENCIA: Continuando sin verificación de base de datos..."
+        else
+            echo "📊 Configuración de MySQL:"
+            echo "   Base de datos: $MYSQL_DB_NAME"
+            echo "   Usuario: $MYSQL_DB_USER"
+            echo "   Host: $MYSQL_DB_HOST"
+            echo "   Puerto: $MYSQL_DB_PORT"
+            
+            # Verificar si MySQL está disponible
+            if ! command -v mysql >/dev/null 2>&1; then
+                echo "❌ ERROR CRÍTICO: MySQL no está instalado o no está en el PATH"
+                echo "   Por favor, instala MySQL o agrégalo al PATH"
+                echo ""
+                read -p "   ¿Deseas continuar de todos modos? (NO RECOMENDADO) [s/N]: " continue_response
+                if [ "$continue_response" != "s" ] && [ "$continue_response" != "S" ]; then
+                    echo ""
+                    echo "🛑 Proceso detenido por el usuario"
+                    echo "   Instala MySQL con: brew install mysql"
+                    exit 1
+                fi
+                echo ""
+                echo "⚠️  ADVERTENCIA: Continuando sin verificación de base de datos..."
+            else
+                # Verificar conexión a MySQL primero
+                echo "🔌 Verificando conexión a MySQL..."
+                mysql -u"$MYSQL_DB_USER" -p"$MYSQL_DB_PASSWORD" -h"$MYSQL_DB_HOST" -P"$MYSQL_DB_PORT" --default-character-set=utf8mb4 -e "SELECT 1;" 2>/dev/null
+                
+                if [ $? -ne 0 ]; then
+                    echo "❌ ERROR CRÍTICO: No se pudo conectar a MySQL"
+                    echo "   Verifica las credenciales en el archivo .env:"
+                    echo "   - Usuario: $MYSQL_DB_USER"
+                    echo "   - Host: $MYSQL_DB_HOST"
+                    echo "   - Puerto: $MYSQL_DB_PORT"
+                    echo ""
+                    read -p "   ¿Deseas continuar de todos modos? (NO RECOMENDADO) [s/N]: " continue_response
+                    if [ "$continue_response" != "s" ] && [ "$continue_response" != "S" ]; then
+                        echo ""
+                        echo "🛑 Proceso detenido por el usuario"
+                        echo "   Por favor, verifica la configuración de MySQL."
+                        exit 1
+                    fi
+                    echo ""
+                    echo "⚠️  ADVERTENCIA: Continuando sin verificación de base de datos..."
+                else
+                    echo "✅ Conexión a MySQL exitosa"
+                fi
+                
+                # Verificar si la base de datos existe
+                DB_CHECK=$(mysql -u"$MYSQL_DB_USER" -p"$MYSQL_DB_PASSWORD" -h"$MYSQL_DB_HOST" -P"$MYSQL_DB_PORT" --default-character-set=utf8mb4 -e "SHOW DATABASES LIKE '$MYSQL_DB_NAME';" 2>/dev/null | grep -v "Database")
+                
+                if [ -n "$DB_CHECK" ]; then
+                    echo "✅ Base de datos '$MYSQL_DB_NAME' ya existe"
+                else
+                    echo "⚠️  Base de datos '$MYSQL_DB_NAME' no existe"
+                    echo "🔨 Creando base de datos '$MYSQL_DB_NAME'..."
+                    
+                    # Crear base de datos
+                    mysql -u"$MYSQL_DB_USER" -p"$MYSQL_DB_PASSWORD" -h"$MYSQL_DB_HOST" -P"$MYSQL_DB_PORT" --default-character-set=utf8mb4 -e "CREATE DATABASE \`$MYSQL_DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
+                    
+                    if [ $? -eq 0 ]; then
+                        echo "✅ Base de datos '$MYSQL_DB_NAME' creada exitosamente"
+                    else
+                        echo ""
+                        echo "======================================================================"
+                        echo "❌ ERROR CRÍTICO: No se pudo crear la base de datos '$MYSQL_DB_NAME'"
+                        echo "======================================================================"
+                        echo ""
+                        echo "💡 Soluciones posibles:"
+                        echo "   1. Verifica que el usuario tenga permisos CREATE DATABASE"
+                        echo "   2. Crea la base de datos manualmente con:"
+                        echo "      CREATE DATABASE \`$MYSQL_DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+                        echo ""
+                        read -p "   ¿Deseas continuar de todos modos? (NO RECOMENDADO) [s/N]: " continue_response
+                        if [ "$continue_response" != "s" ] && [ "$continue_response" != "S" ]; then
+                            echo ""
+                            echo "🛑 Proceso detenido por el usuario"
+                            echo "   Por favor, soluciona los problemas de la base de datos y vuelve a intentar."
+                            exit 1
+                        fi
+                        echo ""
+                        echo "⚠️  ADVERTENCIA: Continuando sin base de datos verificada..."
+                        echo "   Las migraciones probablemente fallarán."
+                    fi
+                fi
+            fi
+        fi
+    fi
+fi
+
+echo ""
+echo "�📁 Recolectando archivos estáticos..."
 .venv/bin/python manage.py collectstatic --noinput
 if [ $? -ne 0 ]; then
     echo "⚠️  Advertencia al recolectar archivos estáticos (puede ser normal si no está configurado)"
@@ -245,6 +400,12 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ Migraciones completadas"
+
+echo "👤 Creando superusuario por defecto (si no existe)..."
+.venv/bin/python create_default_superuser.py
+if [ $? -ne 0 ]; then
+    echo "⚠️  Advertencia al crear superusuario (puede ser normal si ya existe)"
+fi
 
 echo "🔍 Verificando importación de MySQLdb..."
 .venv/bin/python -c "import MySQLdb; print('MySQLdb import successful')" 2>/dev/null

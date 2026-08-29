@@ -1,0 +1,592 @@
+{% extends 'proyecto/common/auth_base.html' %}
+{% load static %}
+
+{% block titulo %}
+    Dashboard
+{% endblock %}
+
+{% block description %}
+    Panel de control del usuario
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'app_1/css/page_login.css' %}">
+    <link rel="stylesheet" href="{% static 'app_1/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="page-wrapper auth">
+        <div class="page-inner bg-brand-gradient">
+            <div class="page-content-wrapper bg-transparent m-0">
+                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient">
+                    <div class="d-flex align-items-center container p-0">
+                        <div class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9 border-0">
+                            <a href="{% url 'dashboard' %}" class="page-logo-link press-scale-down d-flex align-items-center">
+                                <img src="{% static 'proyecto/img/logos/logo-sena-blanco.png' %}" alt="Aplicación Web" aria-roledescription="logo">
+                                <span class="page-logo-text mr-1">Aplicación Web</span>
+                            </a>
+                        </div>
+                        <a href="javascript:void(0);" id="logout-link" class="btn-link text-white ml-auto mr-2">
+                            Cerrar Sesión
+                        </a>
+                        <a href="javascript:void(0);" id="theme-toggle" class="btn-link text-white" title="Cambiar tema">
+                            <i class="fal fa-moon" id="theme-icon"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="flex-1" style="background: url({% static 'proyecto/img/svg/pattern-1.svg' %}) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                                    ¡Bienvenido, {{ user.get_full_name }}!
+                                    <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60">
+                                        Has iniciado sesión exitosamente en la aplicación.
+                                    </small>
+                                </h2>
+                            </div>
+                            <div class="col-xl-8 ml-auto mr-auto">
+                                <!-- Mensajes de Django -->
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                            <strong>
+                                                {% if message.tags == 'error' or message.tags == 'danger' %}
+                                                    <i class="fal fa-exclamation-circle"></i>
+                                                {% elif message.tags == 'warning' %}
+                                                    <i class="fal fa-exclamation-triangle"></i>
+                                                {% elif message.tags == 'success' %}
+                                                    <i class="fal fa-check-circle"></i>
+                                                {% else %}
+                                                    <i class="fal fa-info-circle"></i>
+                                                {% endif %}
+                                            </strong>
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <h3 class="mb-4">Información de tu cuenta</h3>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Nombre completo</label>
+                                                <p class="form-control-plaintext user-info-value">{{ user.get_full_name }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Correo electrónico</label>
+                                                <p class="form-control-plaintext user-info-value">{{ user.email }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Estado de verificación</label>
+                                                <p class="form-control-plaintext">
+                                                    {% if user.email_verified %}
+                                                        <span class="badge badge-success">Verificado</span>
+                                                    {% else %}
+                                                        <span class="badge badge-warning">No verificado</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Miembro desde</label>
+                                                <p class="form-control-plaintext user-info-value">{{ user.date_joined|date:"d/m/Y" }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Suscripción al boletín</label>
+                                                <p class="form-control-plaintext">
+                                                    {% if user.newsletter_subscription %}
+                                                        <span class="badge badge-info">Suscrito</span>
+                                                    {% else %}
+                                                        <span class="badge badge-secondary">No suscrito</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label fw-500">Rol de usuario</label>
+                                                <p class="form-control-plaintext">
+                                                    {% if user.is_superuser %}
+                                                        <span class="badge badge-danger">
+                                                            <i class="fal fa-crown"></i> Superadministrador
+                                                        </span>
+                                                    {% elif user.is_staff %}
+                                                        <span class="badge badge-primary">
+                                                            <i class="fal fa-user-shield"></i> Administrador
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge badge-secondary">
+                                                            <i class="fal fa-user"></i> Usuario
+                                                        </span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info mt-3" role="alert">
+                                        <strong>Nota:</strong> Este es tu panel de control. Aquí podrás gestionar tu cuenta y acceder a las funcionalidades de la aplicación.
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <button type="button" class="btn btn-danger mb-2" id="logout-button">
+                                                <i class="fal fa-sign-out"></i> Cerrar Sesión
+                                            </button>
+                                            <div class="mb-2">
+                                                {% if user.is_staff %}
+                                                <a href="{% url 'admin:index' %}" class="btn btn-primary mr-2" target="_blank">
+                                                    <i class="fal fa-user-shield"></i> Panel de Administración
+                                                </a>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">
+                                                    <i class="fal fa-user-times"></i> Eliminar Cuenta
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sección de sesiones activas -->
+                                {% if multiple_sessions %}
+                                <div class="card p-4 rounded-plus bg-faded mt-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h3 class="mb-0">
+                                            <i class="fal fa-shield-check text-warning"></i>
+                                            Sesiones Activas
+                                        </h3>
+                                        <span class="badge badge-warning badge-pill fs-lg">
+                                            {{ sessions_count }} sesión{{ sessions_count|pluralize:"es" }}
+                                        </span>
+                                    </div>
+
+                                    <div class="alert alert-warning" role="alert">
+                                        <strong><i class="fal fa-exclamation-triangle"></i> Aviso de Seguridad:</strong>
+                                        Has iniciado sesión en múltiples dispositivos. Si no reconoces alguna de estas sesiones, ciérrala inmediatamente y cambia tu contraseña.
+                                    </div>
+
+                                    <!-- Botón para cerrar todas las sesiones excepto la actual -->
+                                    <div class="mb-3">
+                                        <button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#closeAllSessionsModal">
+                                            <i class="fal fa-sign-out-alt"></i> Cerrar todas las demás sesiones
+                                        </button>
+                                    </div>
+
+                                    <div class="list-group">
+                                        {% for session in active_sessions %}
+                                        <div class="list-group-item {% if session.session_key == current_session_key %}border-success{% endif %}">
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <div class="flex-grow-1">
+                                                    <h5 class="mb-1">
+                                                        <i class="fal fa-desktop text-primary"></i>
+                                                        {{ session.get_device_info }}
+                                                        {% if session.session_key == current_session_key %}
+                                                            <span class="badge badge-success ml-2">Sesión actual</span>
+                                                        {% endif %}
+                                                    </h5>
+                                                    <p class="mb-1 small">
+                                                        <i class="fal fa-map-marker-alt"></i>
+                                                        <strong>IP:</strong> {{ session.ip_address }}
+                                                    </p>
+                                                    <p class="mb-1 small">
+                                                        <i class="fal fa-clock"></i>
+                                                        <strong>Iniciada:</strong> {{ session.created_at|date:"d/m/Y H:i" }}
+                                                    </p>
+                                                    <p class="mb-0 small">
+                                                        <i class="fal fa-history"></i>
+                                                        <strong>Última actividad:</strong> {{ session.last_activity|date:"d/m/Y H:i" }}
+                                                    </p>
+                                                </div>
+                                                {% if session.session_key != current_session_key %}
+                                                <div class="ml-3">
+                                                    <form method="post" action="{% url 'terminate_session' session.session_key %}" class="terminate-session-form" style="display: inline;">
+                                                        {% csrf_token %}
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-danger btn-terminate-session" 
+                                                                data-session-key="{{ session.session_key }}"
+                                                                data-device-info="{{ session.get_device_info }}"
+                                                                data-ip="{{ session.ip_address }}"
+                                                                data-last-activity="{{ session.last_activity|date:'d/m/Y H:i' }}">
+                                                            <i class="fal fa-times-circle"></i> Cerrar sesión
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="alert alert-info mt-3 mb-0" role="alert">
+                                        <small>
+                                            <i class="fal fa-info-circle"></i>
+                                            <strong>Consejo de seguridad:</strong> Revisa regularmente tus sesiones activas. Si ves actividad sospechosa, cierra todas las sesiones excepto la actual y cambia tu contraseña inmediatamente.
+                                        </small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-white">
+                            2020 &copy; SmartAdmin by&nbsp;<a href='https://www.gotbootstrap.com' class='text-white opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>gotbootstrap.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cerrar Todas las Sesiones -->
+    <div class="modal fade" id="closeAllSessionsModal" tabindex="-1" role="dialog" aria-labelledby="closeAllSessionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="closeAllSessionsModalLabel">
+                        <i class="fal fa-shield-check"></i> Cerrar Todas las Demás Sesiones
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fal fa-shield-check text-warning" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h5 class="text-center mb-4">
+                        ¿Deseas cerrar todas las sesiones activas excepto la actual?
+                    </h5>
+
+                    <div class="alert alert-info mb-3" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fal fa-info-circle"></i> Esta acción cerrará:
+                        </h6>
+                        <ul class="mb-0">
+                            <li><strong>{{ sessions_count|add:"-1" }} sesión{% if sessions_count > 2 %}es{% endif %}</strong> en otros dispositivos</li>
+                            <li>Todas las sesiones <strong>excepto la sesión actual</strong></li>
+                            <li>Tendrás que volver a iniciar sesión en esos dispositivos</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h6 class="mb-2">
+                            <i class="fal fa-laptop text-primary"></i> Sesiones que se cerrarán:
+                        </h6>
+                        <div class="list-unstyled mb-0">
+                            {% for session in active_sessions %}
+                                {% if session.session_key != current_session_key %}
+                                <div class="d-flex align-items-start mb-2">
+                                    <i class="fal fa-times-circle text-danger mt-1 mr-2"></i>
+                                    <div>
+                                        <strong>{{ session.get_device_info }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            IP: {{ session.ip_address }} | Última actividad: {{ session.last_activity|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success mb-0" role="alert">
+                        <h6 class="mb-1">
+                            <i class="fal fa-check-circle"></i> Sesión que permanecerá activa:
+                        </h6>
+                        {% for session in active_sessions %}
+                            {% if session.session_key == current_session_key %}
+                            <div class="d-flex align-items-start">
+                                <i class="fal fa-desktop text-success mt-1 mr-2"></i>
+                                <div>
+                                    <strong>{{ session.get_device_info }}</strong> <span class="badge badge-success ml-1">Actual</span>
+                                    <br>
+                                    <small class="text-muted">
+                                        IP: {{ session.ip_address }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fal fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmCloseAllSessions">
+                        <i class="fal fa-sign-out-alt"></i> Sí, cerrar todas las demás sesiones
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito al Cerrar Sesiones -->
+    <div class="modal fade" id="sessionsClosedSuccessModal" tabindex="-1" role="dialog" aria-labelledby="sessionsClosedSuccessModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="sessionsClosedSuccessModalLabel">
+                        <i class="fal fa-check-circle"></i> Sesiones Cerradas
+                    </h5>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <i class="fal fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h4 class="mb-3">¡Sesiones cerradas exitosamente!</h4>
+                    <p class="mb-2" id="sessionsClosedMessage">
+                        Se cerraron exitosamente <strong id="closedSessionsCount">0</strong> sesión(es).
+                    </p>
+                    <p class="text-muted mb-0">
+                        La página se recargará automáticamente en <strong id="reloadCountdown">3</strong> segundos...
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" id="reloadNowBtn">
+                        <i class="fal fa-sync"></i> Recargar ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cerrar Sesión Individual -->
+    <div class="modal fade" id="terminateSessionModal" tabindex="-1" role="dialog" aria-labelledby="terminateSessionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="terminateSessionModalLabel">
+                        <i class="fal fa-exclamation-triangle"></i> Cerrar Sesión
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fal fa-question-circle fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="text-center mb-3">¿Estás seguro de que deseas cerrar esta sesión?</h5>
+                    
+                    <div class="alert alert-warning mb-3" role="alert">
+                        <h6 class="mb-2">
+                            <i class="fal fa-info-circle"></i> Se cerrará la sesión:
+                        </h6>
+                        <div class="d-flex align-items-start">
+                            <i class="fal fa-desktop mt-1 mr-2"></i>
+                            <div>
+                                <strong id="modalDeviceInfo"></strong>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fal fa-map-marker-alt"></i> IP: <span id="modalIpAddress"></span>
+                                    <br>
+                                    <i class="fal fa-clock"></i> Última actividad: <span id="modalLastActivity"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted text-center mb-0">
+                        Tendrás que volver a iniciar sesión en ese dispositivo.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fal fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmTerminateSession">
+                        <i class="fal fa-times-circle"></i> Sí, cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cerrar Sesión -->
+    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" role="dialog" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="logoutConfirmModalLabel">
+                        <i class="fal fa-sign-out"></i> Confirmar Cierre de Sesión
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fal fa-question-circle fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="text-center mb-3">¿Estás seguro de que deseas cerrar sesión?</h5>
+                    <p class="text-muted text-center mb-0">
+                        Se cerrará tu sesión actual y tendrás que volver a iniciar sesión para acceder al sistema.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fal fa-times"></i> Cancelar
+                    </button>
+                    <a href="{% url 'logout' %}" class="btn btn-warning" id="confirmLogoutBtn">
+                        <i class="fal fa-sign-out"></i> Sí, cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Última Advertencia para Eliminar Cuenta -->
+    <div class="modal fade" id="finalWarningModal" tabindex="-1" role="dialog" aria-labelledby="finalWarningModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="finalWarningModalLabel">
+                        <i class="fal fa-exclamation-triangle fa-lg"></i> ÚLTIMA ADVERTENCIA
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fal fa-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+
+                    <h4 class="text-center text-danger mb-4">
+                        <strong>Esta acción es PERMANENTE e IRREVERSIBLE</strong>
+                    </h4>
+
+                    <div class="alert alert-danger mb-4" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fal fa-trash-alt"></i> Se eliminarán permanentemente:
+                        </h5>
+                        <ul class="mb-0">
+                            <li><strong>Todos tus datos personales</strong> (nombre, email, preferencias)</li>
+                            <li><strong>Todas tus sesiones activas</strong> en todos los dispositivos</li>
+                            <li><strong>Tu acceso completo</strong> a todos los servicios de la plataforma</li>
+                            <li><strong>Tu historial</strong> y configuraciones personalizadas</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-light p-3 rounded mb-3">
+                        <p class="mb-2">
+                            <i class="fal fa-ban text-danger"></i>
+                            <strong>NO PODRÁS:</strong>
+                        </p>
+                        <ul class="mb-0">
+                            <li>Recuperar tu cuenta después de eliminarla</li>
+                            <li>Recuperar ninguno de tus datos</li>
+                            <li>Deshacer esta acción de ninguna manera</li>
+                        </ul>
+                    </div>
+
+                    <h5 class="text-center mt-4 mb-3">
+                        ¿Estás <strong class="text-danger">absolutamente seguro</strong> de que deseas continuar?
+                    </h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-lg btn-success" id="cancelFinalWarning">
+                        <i class="fal fa-arrow-left"></i> No, mantener mi cuenta
+                    </button>
+                    <button type="button" class="btn btn-lg btn-danger" id="confirmFinalDeletion">
+                        <i class="fal fa-trash-alt"></i> Sí, eliminar permanentemente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Eliminar Cuenta -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">
+                        <i class="fal fa-exclamation-triangle"></i> Eliminar Cuenta Permanentemente
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" action="{% url 'delete_account' %}" id="deleteAccountForm">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <!-- Área de mensajes de error -->
+                        <div id="deleteAccountError" class="alert alert-warning d-none" role="alert">
+                            <strong><i class="fal fa-exclamation-triangle"></i> Error:</strong>
+                            <span id="deleteAccountErrorMessage"></span>
+                        </div>
+
+                        <div class="alert alert-danger" role="alert">
+                            <strong><i class="fal fa-exclamation-circle"></i> ¡Advertencia!</strong>
+                            <p class="mb-0">Esta acción es <strong>irreversible</strong>. Al eliminar tu cuenta:</p>
+                            <ul class="mb-0 mt-2">
+                                <li>Se eliminarán todos tus datos personales</li>
+                                <li>Se cerrarán todas tus sesiones activas</li>
+                                <li>No podrás recuperar tu cuenta</li>
+                                <li>Perderás acceso a todos los servicios</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deletePassword" class="fw-500">
+                                <i class="fal fa-lock"></i> Confirma tu contraseña para continuar
+                            </label>
+                            <input
+                                type="password"
+                                class="form-control form-control-lg"
+                                id="deletePassword"
+                                name="password"
+                                placeholder="Ingresa tu contraseña actual"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <small class="form-text text-muted">
+                                Por seguridad, debes ingresar tu contraseña actual para confirmar la eliminación.
+                            </small>
+                            <div class="invalid-feedback" id="passwordError">
+                                La contraseña ingresada es incorrecta.
+                            </div>
+                        </div>
+
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="confirmDelete" required>
+                            <label class="custom-control-label" for="confirmDelete">
+                                Entiendo que esta acción es permanente e irreversible
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fal fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                            <i class="fal fa-trash-alt"></i> Eliminar mi cuenta permanentemente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'proyecto/js/miscellaneous/preferences/theme-toggle.js' %}"></script>
+    <script src="{% static 'app_1/js/dashboard.js' %}"></script>
+    <script src="{% static 'app_1/js/session-timeout.js' %}"></script>
+    <script src="{% static 'app_1/js/logout-confirm-modal.js' %}"></script>
+    <script src="{% static 'app_1/js/delete-account-modal.js' %}"></script>
+    <script src="{% static 'app_1/js/close-all-sessions-modal.js' %}"></script>
+    <script src="{% static 'app_1/js/terminate-session-modal.js' %}"></script>
+{% endblock %}

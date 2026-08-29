@@ -8,12 +8,9 @@ db.sqlite3
 # If you are using PostgreSQL
 *.psql
 
-# Ignore Django migration files
-*/migrations/*
-!*/migrations/__init__.py
-
-# Ignore ".log"
-eva.log
+# Ignorar migraciones de Django (se generan automáticamente al ejecutar makemigrations)
+**/migrations/*.py
+!**/migrations/__init__.py
 
 # Ignore ".git"
 ._.git
@@ -194,6 +191,9 @@ cython_debug/
 # Ignore Visual Studio Code Settings (.vscode)
 .vscode/
 
+# Ignore Cursor files
+.cursor/
+
 # Ignore password files
 users.txt
 database.txt
@@ -211,14 +211,38 @@ database.txt
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Ingnore files markdown (.md) except README.md
+*.md
+!README.md
 
 # Ignore files for claude.ai/code
 .claude/
 CLAUDE.md
 
+# Ignore files for chatgpt
+.chatgpt/
+CHATGPT.md
+AGENTS.md
+
 # Ignore files for warp.dev
 .warp/
 WARP.md
 
-# Ignore files for cursor.ai
-.cursor/
+# Ignore log files
+*.log
+logs/
+
+# Ignore temp files
+*.tmp
+temp/
+tmp/
+
+# Ignore cache files
+*.cache
+cache/
