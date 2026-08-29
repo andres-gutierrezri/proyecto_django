@@ -946,6 +946,14 @@ git commit -m "feat: Proyecto Django inicial"
 git branch -M main
 git remote add origin https://github.com/USUARIO/proyecto.git
 git push -u origin main
+
+# Verificar remotos
+git remote -v  # Verificar remotos
+
+# failed to push some refs to [remote repo]
+# Si ocurre este error, use:
+git pull origin main --allow-unrelated-histories # Si hay conflictos de historial
+git pull --rebase origin main # Para rebase de commits
 ```
 
 Para GitLab, sustituya la URL de *origin*.
