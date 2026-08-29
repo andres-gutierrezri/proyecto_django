@@ -9,8 +9,8 @@ db.sqlite3
 *.psql
 
 # Ignorar migraciones de Django (se generan automáticamente al ejecutar makemigrations)
-*/migrations/*
-!*/migrations/__init__.py
+**/migrations/*.py
+!**/migrations/__init__.py
 
 # Ignore ".git"
 ._.git
